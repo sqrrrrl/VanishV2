@@ -1,0 +1,16 @@
+name: Vanish
+main: superbobby\Vanish\Vanish
+api: 3.0.0
+version: "1.0"
+author: superbobby
+commands:
+  vanish:
+    description: "Vanish yourself"
+    permission: "vanish.use"
+permissions:
+  vanish.use:
+    description: "Vanish use perm"
+    default: op
+  vanish.see:
+     description: "Vanish see perm"
+     default: op
