@@ -2,7 +2,7 @@
 branches:
 - master
 projects:
-  Vanish:
-    path: Vanish/
+  VanishV2:
+    path: VanishV2/
     icon: icon.png
 ...
