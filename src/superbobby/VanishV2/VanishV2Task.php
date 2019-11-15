@@ -7,7 +7,7 @@ use pocketmine\Server;
 
 use function in_array;
 
-class VanishTask extends Task {
+class VanishV2Task extends Task {
 
     public function onRun(int $currentTick){
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
