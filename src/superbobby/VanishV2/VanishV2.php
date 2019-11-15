@@ -14,7 +14,7 @@ use function array_search;
 use function in_array;
 use function strtolower;
 
-class Vanish extends PluginBase {
+class VanishV2 extends PluginBase {
     public const PREFIX = "§9Vanish §8» §r";
 
     public static $vanish = [];
