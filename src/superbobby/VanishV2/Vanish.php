@@ -1,6 +1,6 @@
 <?php
 
-namespace superbobby\Vanish;
+namespace superbobby\VanishV2;
 
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
