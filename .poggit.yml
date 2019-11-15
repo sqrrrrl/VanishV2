@@ -3,6 +3,6 @@ branches:
 - master
 projects:
   VanishV2:
-    path: VanishV2/
+    path: ""
     icon: icon.png
 ...
