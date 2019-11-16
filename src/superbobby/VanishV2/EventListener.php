@@ -13,6 +13,6 @@ class EventListener implements Listener {
     public function onQuit(PlayerQuitEvent $event){
         $player = $event->getPlayer();
         $name = $player->getName();
-        if(in_array($name, Vanish::$vanish)) unset(Vanish::$vanish[array_search($name, Vanish::$vanish)]);
+        if(in_array($name, VanishV2::$vanish)) unset(VanishV2::$vanish[array_search($name, VanishV2::$vanish)]);
     }
 }
