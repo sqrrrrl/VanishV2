@@ -49,7 +49,6 @@ class VanishV2 extends PluginBase {
 		$sender->sendMessage(self::PREFIX."§aYou are now vanished.");
 		$name = $sender->getName();
 		$sender->setNameTag("§6[VANISH]§r $name");
-		$sender->setDisplayName("§6[VANISH]§r $name");
 		$entry = new PlayerListEntry();
 		$entry->uuid = $sender->getUniqueId();
 
