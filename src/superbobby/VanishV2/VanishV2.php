@@ -26,7 +26,7 @@ class VanishV2 extends PluginBase {
     public function onEnable(){
         self::$main = $this;
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
-        $this->getScheduler()->scheduleRepeatingTask(new VanishTask(), 20);
+        $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
     }
 
     public static function getMain(): self{
