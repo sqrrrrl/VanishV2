@@ -8,6 +8,9 @@ commands:
   vanish:
     description: "Vanish yourself"
     permission: "vanish.use"
+  v:
+    description: "Vanish yourself"
+    permission: "vanish.use"
 permissions:
   vanish.use:
     description: "Vanish use perm"

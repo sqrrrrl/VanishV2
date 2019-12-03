@@ -35,7 +35,7 @@ class VanishV2 extends PluginBase {
 
     public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args): bool{
         $name = $sender->getName();
-        if(strtolower($cmd->getName()) === "vanish"){
+        if(strtolower($cmd->getName()) === "vanish" or ($cmd->getName()) === "v"){
 	    if(!$sender instanceof Player){
                 $sender->sendMessage(self::PREFIX."§4Use this command InGame");
                 return false;
