@@ -9,10 +9,13 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
+use pocketmine\network\mcpe\protocol\types\SkinData;
+use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
 
 use function array_search;
 use function in_array;
 use function strtolower;
+use function sendFullPlayerListData;
 
 class VanishV2 extends PluginBase {
     public const PREFIX = "§9Vanish §8» §r";
@@ -63,24 +66,18 @@ class VanishV2 extends PluginBase {
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($sender);
                 }
+        $pk = new PlayerListPacket();
+        $pk->type = PlayerListPacket::TYPE_ADD;
+        foreach($this->getServer()->getOnlinePlayers() as $p){
+            $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
+        }
+
+        $p->dataPacket($pk);
                 $sender->sendMessage(self::PREFIX."§4You are no longer vanished!");
                 $name = $sender->getName();
                 $sender->setNameTag("$name");
-                $entry = new PlayerListEntry();
-                $entry->uuid = $sender->getUniqueId();
-                $entry->entityUniqueId = $sender->getId();
-                $entry->xboxUserId = $sender->getXuid();
-                $entry->username = $sender->getName();
-                $entry->skin = $sender->getSkin();
-                $pk = new PlayerListPacket();
-                $pk->entries[] = $entry;
-                $pk->type = PlayerListPacket::TYPE_ADD;
-                foreach($this->getServer()->getOnlinePlayers() as $players){
-
-                    $players->sendDataPacket($pk);
                 }
             }
-        }
         return true;
+       }
     }
-}
