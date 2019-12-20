@@ -39,45 +39,38 @@ class VanishV2 extends PluginBase {
     public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args): bool{
         $name = $sender->getName();
         if(strtolower($cmd->getName()) === "vanish" or ($cmd->getName()) === "v"){
-	    if(!$sender instanceof Player){
+	        if(!$sender instanceof Player){
                 $sender->sendMessage(self::PREFIX."§4Use this command InGame");
                 return false;
             }
-	    if(!$sender->hasPermission("vanish.use")){
-		$sender->sendMessage(self::PREFIX."§4You do not have permission to use this command");
+
+	        if(!$sender->hasPermission("vanish.use")){
+		        $sender->sendMessage(self::PREFIX."§4You do not have permission to use this command");
                 return false;
             }
+
             if(!in_array($name, self::$vanish)){
                 self::$vanish[] = $name;
-		$sender->sendMessage(self::PREFIX."§aYou are now vanished.");
-		$name = $sender->getName();
-		$sender->setNameTag("§6[VANISH]§r $name");
-		$entry = new PlayerListEntry();
-		$entry->uuid = $sender->getUniqueId();
-
-		$pk = new PlayerListPacket();
-		$pk->entries[] = $entry;
-		$pk->type = PlayerListPacket::TYPE_REMOVE;
-
-		foreach($this->getServer()->getOnlinePlayers() as $players);
-	            $players->sendDataPacket($pk);
+		        $sender->sendMessage(self::PREFIX."§aYou are now vanished.");
+		        $name = $sender->getName();
+		        $sender->setNameTag("§6[VANISH]§r $name");
             }else{
                 unset(self::$vanish[array_search($name, self::$vanish)]);
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($sender);
                 }
-        $pk = new PlayerListPacket();
-        $pk->type = PlayerListPacket::TYPE_ADD;
-        foreach($this->getServer()->getOnlinePlayers() as $p){
-            $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
-        }
+             $pk = new PlayerListPacket();
+             $pk->type = PlayerListPacket::TYPE_ADD;
+             foreach($this->getServer()->getOnlinePlayers() as $p){
+                 $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
+             }
 
-        $p->dataPacket($pk);
+             $p->sendDataPacket($pk);
                 $sender->sendMessage(self::PREFIX."§4You are no longer vanished!");
                 $name = $sender->getName();
                 $sender->setNameTag("$name");
-                }
             }
+        }
         return true;
-       }
     }
+}
