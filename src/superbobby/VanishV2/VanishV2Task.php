@@ -4,6 +4,8 @@ namespace superbobby\VanishV2;
 
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
+use pocketmine\network\mcpe\protocol\types\SkinData;
+use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 
