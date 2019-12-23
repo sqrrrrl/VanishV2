@@ -22,6 +22,8 @@ class VanishV2 extends PluginBase {
 
     public static $vanish = [];
 
+    public static $nametagg = [];
+
     public $pk;
 
     protected static $main;
@@ -52,23 +54,22 @@ class VanishV2 extends PluginBase {
             if(!in_array($name, self::$vanish)){
                 self::$vanish[] = $name;
 		        $sender->sendMessage(self::PREFIX."§aYou are now vanished.");
-		        $name = $sender->getName();
-		        $sender->setNameTag("§6[VANISH]§r $name");
+		        $nameTag = $sender->getNameTag();
+		        self::$nametagg[$name] = $nameTag;
+		        $sender->setNameTag("§6[VANISH]§r $nameTag");
             }else{
                 unset(self::$vanish[array_search($name, self::$vanish)]);
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($sender);
+                    $nameTag = self::$nametagg[$name];
+                    $sender->setNameTag("$nameTag");
                 }
              $pk = new PlayerListPacket();
              $pk->type = PlayerListPacket::TYPE_ADD;
-             foreach($this->getServer()->getOnlinePlayers() as $p){
                  $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
-             }
-
+             foreach($this->getServer()->getOnlinePlayers() as $p)
              $p->sendDataPacket($pk);
                 $sender->sendMessage(self::PREFIX."§4You are no longer vanished!");
-                $name = $sender->getName();
-                $sender->setNameTag("$name");
             }
         }
         return true;
