@@ -1,0 +1,14 @@
+#  Use the § symbol for color coding
+# Use %name for the name of the player who did /vanish
+#   Default Config:
+#     FakeLeave-message: "§e$name Left the game"
+#     FakeJoin-message: "§e$name joined the game"
+
+# The message that will be sent to online players when you will activate your vanish
+enable-leave: false
+FakeLeave-message: "§e%name left the game"
+
+# The message that will be sent to online players when you will deactivate you vanish
+enable-join: false
+FakeJoin-message: "§e%name joined the game"
+...

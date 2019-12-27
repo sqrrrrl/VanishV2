@@ -32,6 +32,8 @@ class VanishV2 extends PluginBase {
         self::$main = $this;
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
+        @mkdir($this->getDataFolder());
+        $this->saveDefaultConfig();
     }
 
     public static function getMain(): self{
@@ -57,12 +59,22 @@ class VanishV2 extends PluginBase {
 		        $nameTag = $sender->getNameTag();
 		        self::$nametagg[$name] = $nameTag;
 		        $sender->setNameTag("§6[VANISH]§r $nameTag");
+                if($this->getConfig()->get("enable-leave") === true){
+                    $msg = $this->getConfig()->get("FakeLeave-message");
+                    $msg = str_replace("%name", "$name", $msg);
+                    $this->getServer()->broadcastMessage($msg);
+                }
             }else{
                 unset(self::$vanish[array_search($name, self::$vanish)]);
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($sender);
                     $nameTag = self::$nametagg[$name];
                     $sender->setNameTag("$nameTag");
+                    if($this->getConfig()->get("enable-join") === true){
+                        $msg = $this->getConfig()->get("FakeJoin-message");
+                        $msg = str_replace("%name", "$name", $msg);
+                        $this->getServer()->broadcastMessage($msg);
+                    }
                 }
              $pk = new PlayerListPacket();
              $pk->type = PlayerListPacket::TYPE_ADD;
