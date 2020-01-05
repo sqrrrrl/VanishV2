@@ -79,13 +79,13 @@ class VanishV2 extends PluginBase {
 						$msg = str_replace("%name", "$name", $msg);
 						$this->getServer()->broadcastMessage($msg);
 					}
-				$pk = new PlayerListPacket();
-				$pk->type = PlayerListPacket::TYPE_ADD;
-				$pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
-				foreach($this->getServer()->getOnlinePlayers() as $p) {
-					$p->sendDataPacket($pk);
-				}
-				$sender->sendMessage(self::PREFIX . C::DARK_RED . "You are no longer vanished!");
+					$pk = new PlayerListPacket();
+					$pk->type = PlayerListPacket::TYPE_ADD;
+					$pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
+					foreach($this->getServer()->getOnlinePlayers() as $p) {
+						$p->sendDataPacket($pk);
+					}
+					$sender->sendMessage(self::PREFIX . C::DARK_RED . "You are no longer vanished!");
 				}
 			break;
         }
