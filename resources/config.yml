@@ -1,4 +1,4 @@
-#  Use the § symbol for color coding
+# Use the § symbol for color coding
 # Use %name for the name of the player who did /vanish
 #   Default Config:
 #     FakeLeave-message: "§e%name Left the game"

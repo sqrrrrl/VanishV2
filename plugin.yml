@@ -6,15 +6,14 @@ version: "1.4"
 author: superbobby
 commands:
   vanish:
-    description: "Vanish yourself"
+    description: "Enter vanish mode"
     permission: "vanish.use"
-  v:
-    description: "Vanish yourself"
-    permission: "vanish.use"
+    aliases:
+    - v
 permissions:
   vanish.use:
-    description: "Vanish use perm"
+    description: "Permission to use the vanish command"
     default: op
   vanish.see:
-     description: "Vanish see perm"
+     description: "Permission to see vanished players"
      default: op
