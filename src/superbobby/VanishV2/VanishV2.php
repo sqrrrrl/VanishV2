@@ -49,12 +49,12 @@ class VanishV2 extends PluginBase {
 	        if(!$sender instanceof Player){
                 $sender->sendMessage(self::PREFIX . C::DARK_RED . "Use this command InGame.");
                 return false;
-              	}
+	        }
 
 	        if(!$sender->hasPermission("vanish.use")){
 		        $sender->sendMessage(self::PREFIX . C::DARK_RED . "You do not have permission to use this command");
                 return false;
-            	}
+	        }
 
             if(!in_array($name, self::$vanish)){
                 self::$vanish[] = $name;
@@ -79,11 +79,11 @@ class VanishV2 extends PluginBase {
                  $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
              foreach($this->getServer()->getOnlinePlayers() as $p)
              $p->sendDataPacket($pk);
-		    if($this->getConfig()->get("enable-join") === true){
+		        if($this->getConfig()->get("enable-join") === true){
                         $msg = $this->getConfig()->get("FakeJoin-message");
                         $msg = str_replace("%name", "$name", $msg);
                         $this->getServer()->broadcastMessage($msg);
-                    }
+		        }
                	    $sender->sendMessage(self::PREFIX . C::DARK_RED . "You are no longer vanished!");
             }
         }
