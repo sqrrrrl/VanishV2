@@ -5,6 +5,7 @@ namespace superbobby\VanishV2;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\PluginTask;
+use pocketmine\utils\TextFormat as C;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
@@ -18,7 +19,7 @@ use function strtolower;
 use function sendFullPlayerListData;
 
 class VanishV2 extends PluginBase {
-    public const PREFIX = "§9Vanish §8» §r";
+    public const PREFIX = C::BLUE . "Vanish " . C::DARK_GRAY . "» ". C::RESET;
 
     public static $vanish = [];
 
@@ -42,20 +43,22 @@ class VanishV2 extends PluginBase {
 
     public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args): bool{
         $name = $sender->getName();
-        if(strtolower($cmd->getName()) === "vanish" or ($cmd->getName()) === "v"){
+        switch(strtolower($cmd->getName())){
+		case "vanish":
+		case "v":
 	        if(!$sender instanceof Player){
-                $sender->sendMessage(self::PREFIX."§4Use this command InGame");
+                $sender->sendMessage(self::PREFIX . C::DARK_RED . "Use this command InGame.");
                 return false;
-            }
+              	}
 
 	        if(!$sender->hasPermission("vanish.use")){
-		        $sender->sendMessage(self::PREFIX."§4You do not have permission to use this command");
+		        $sender->sendMessage(self::PREFIX . C::DARK_RED . "You do not have permission to use this command");
                 return false;
-            }
+            	}
 
             if(!in_array($name, self::$vanish)){
                 self::$vanish[] = $name;
-		        $sender->sendMessage(self::PREFIX."§aYou are now vanished.");
+		        $sender->sendMessage(self::PREFIX . C::GREEN . "You are now vanished.");
 		        $nameTag = $sender->getNameTag();
 		        self::$nametagg[$name] = $nameTag;
 		        $sender->setNameTag("§6[VANISH]§r $nameTag");
@@ -63,7 +66,7 @@ class VanishV2 extends PluginBase {
                     $msg = $this->getConfig()->get("FakeLeave-message");
                     $msg = str_replace("%name", "$name", $msg);
                     $this->getServer()->broadcastMessage($msg);
-                }
+             	}
             }else{
                 unset(self::$vanish[array_search($name, self::$vanish)]);
                 foreach($this->getServer()->getOnlinePlayers() as $players){
@@ -81,7 +84,7 @@ class VanishV2 extends PluginBase {
                         $msg = str_replace("%name", "$name", $msg);
                         $this->getServer()->broadcastMessage($msg);
                     }
-               	    $sender->sendMessage(self::PREFIX."§4You are no longer vanished!");
+               	    $sender->sendMessage(self::PREFIX . C::DARK_RED . "You are no longer vanished!");
             }
         }
         return true;
