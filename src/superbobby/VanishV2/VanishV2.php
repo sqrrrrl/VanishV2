@@ -16,7 +16,6 @@ use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
 use function array_search;
 use function in_array;
 use function strtolower;
-use function sendFullPlayerListData;
 
 class VanishV2 extends PluginBase {
     public const PREFIX = C::BLUE . "Vanish " . C::DARK_GRAY . "» ". C::RESET;
