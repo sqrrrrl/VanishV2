@@ -18,7 +18,7 @@ use function in_array;
 use function strtolower;
 
 class VanishV2 extends PluginBase {
-    public const PREFIX = C::BLUE . "Vanish " . C::DARK_GRAY . "» ". C::RESET;
+    public const PREFIX = C::BLUE . "VanishV2 " . C::DARK_GRAY . "» ". C::RESET;
 
     public static $vanish = [];
 
