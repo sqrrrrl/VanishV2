@@ -19,6 +19,7 @@ class VanishV2Task extends Task {
             if($p->spawned){
                 if(in_array($p->getName(), VanishV2::$vanish)){
                     foreach(Server::getInstance()->getOnlinePlayers() as $player){
+                        $p->sendPopup("§aYou are currently vanished");
 			            if($player->hasPermission("vanish.see")){
 			                $player->showPlayer($p);
 		                }else{
