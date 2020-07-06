@@ -28,12 +28,17 @@ class VanishV2 extends PluginBase {
 
     protected static $main;
 
-    public function onEnable(){
+    public function onEnable()
+    {
         self::$main = $this;
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
+        if(!$this->getConfig()->get("config-version")){
+            $this->getLogger()->notice("Your configuration file is outdated you have to delete it to get the new update");
+            $this->getServer()->getPluginManager()->disablePlugin($this);
+        }
     }
 
     public static function getMain(): self{
@@ -66,6 +71,12 @@ class VanishV2 extends PluginBase {
                     $msg = str_replace("%name", "$name", $msg);
                     $this->getServer()->broadcastMessage($msg);
                 }
+                    if($this->getConfig()->get("enable-fly") === true){
+                        if($sender->getGamemode() === 0){
+                        $sender->setFlying(true);
+                        $sender->setAllowFlight(true);
+                        }
+                    }
                     foreach($this->getServer()->getOnlinePlayers() as $players){
                         if($players->hasPermission("vanish.see")){
                             $players->sendMessage(C::ITALIC . C::GRAY . "[$name: Vanished]");
@@ -79,6 +90,12 @@ class VanishV2 extends PluginBase {
                     $sender->setNameTag("$nameTag");
                     if($players->hasPermission("vanish.see")){
                         $players->sendMessage(C::ITALIC . C::GRAY . "[$name: Unvanished]");
+                    }
+                }
+                if($this->getConfig()->get("enable-fly") === true){
+                    if($sender->getGamemode() === 0){
+                        $sender->setFlying(false);
+                        $sender->setAllowFlight(false);
                     }
                 }
              $pk = new PlayerListPacket();
