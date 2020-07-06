@@ -2,6 +2,7 @@
 
 namespace superbobby\VanishV2;
 
+use pocketmine\event\entity\EntityCombustEvent;
 use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\Player;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -48,7 +49,19 @@ class EventListener implements Listener {
             $name = $player->getName();
             if (in_array($name, VanishV2::$vanish)) {
                 if ($this->plugin->getConfig()->get("disable-damage") === true) {
-                    $event->setCancelled(true);
+                    $event->setCancelled();
+                }
+            }
+        }
+    }
+
+    public function onPlayerBurn(EntityCombustEvent $event){
+        $player = $event->getEntity();
+        if($player instanceof Player){
+            $name = $player->getName();
+            if(in_array($name, VanishV2::$vanish)){
+                if($this->plugin->getConfig()->get("disable-damage") === true){
+                    $event->setCancelled();
                 }
             }
         }
