@@ -65,13 +65,21 @@ class VanishV2 extends PluginBase {
                     $msg = $this->getConfig()->get("FakeLeave-message");
                     $msg = str_replace("%name", "$name", $msg);
                     $this->getServer()->broadcastMessage($msg);
-             	}
+                }
+                    foreach($this->getServer()->getOnlinePlayers() as $players){
+                        if($players->hasPermission("vanish.see")){
+                            $players->sendMessage(C::ITALIC . C::GRAY . "[$name: Vanished]");
+                        }
+                    }
             }else{
                 unset(self::$vanish[array_search($name, self::$vanish)]);
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($sender);
                     $nameTag = self::$nametagg[$name];
                     $sender->setNameTag("$nameTag");
+                    if($players->hasPermission("vanish.see")){
+                        $players->sendMessage(C::ITALIC . C::GRAY . "[$name: Unvanished]");
+                    }
                 }
              $pk = new PlayerListPacket();
              $pk->type = PlayerListPacket::TYPE_ADD;
