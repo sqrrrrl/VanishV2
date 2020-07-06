@@ -4,11 +4,23 @@
 #     FakeLeave-message: "§e%name Left the game"
 #     FakeJoin-message: "§e%name joined the game"
 
-# The message that will be sent to online players when you will activate your vanish
+# Do not change this!
+config-version: 1
+
+# The message that will be sent to online players when you turn on your vanish
 enable-leave: false
 FakeLeave-message: "§e%name left the game"
 
-# The message that will be sent to online players when you will deactivate you vanish
+# The message that will be sent to online players when you turn off your vanish
 enable-join: false
 FakeJoin-message: "§e%name joined the game"
+
+# Choose if the player should be unvanished when he leave the server
+unvanish-after-leaving: false
+
+# Choose if vanished players can fly when they are in survival
+enable-fly: true
+
+# Choose if vanished players can take damage when they are in survival mode
+disable-damage: true
 ...
