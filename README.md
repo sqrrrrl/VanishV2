@@ -6,4 +6,3 @@ VanishV2 can remove you from the online players list to be incognito when you ar
 
 Finnally, with VanishV2 you can choose with the permission vanish.see who can see you when you're vanished.
 [![](https://poggit.pmmp.io/shield.state/VanishV2)](https://poggit.pmmp.io/p/VanishV2)
-<a href="https://poggit.pmmp.io/p/VanishV2"><img src="https://poggit.pmmp.io/shield.state/VanishV2"></a>
