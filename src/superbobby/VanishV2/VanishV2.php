@@ -24,12 +24,15 @@ class VanishV2 extends PluginBase {
 
     public static $nametagg = [];
 
+    public static $online = [];
+
+    public static $AllowCombatFly = []; //for BlazinFly compatibility
+
     public $pk;
 
     protected static $main;
 
-    public function onEnable()
-    {
+    public function onEnable() {
         self::$main = $this;
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
@@ -62,6 +65,7 @@ class VanishV2 extends PluginBase {
 
             if(!in_array($name, self::$vanish)){
                 self::$vanish[] = $name;
+                unset(self::$online[array_search($sender, self::$online, True)]);
 		        $sender->sendMessage(self::PREFIX . C::GREEN . "You are now vanished.");
 		        $nameTag = $sender->getNameTag();
 		        self::$nametagg[$name] = $nameTag;
@@ -73,6 +77,7 @@ class VanishV2 extends PluginBase {
                 }
                     if($this->getConfig()->get("enable-fly") === true){
                         if($sender->getGamemode() === 0){
+                        self::$AllowCombatFly[] = $name; //for BlazinFly compatibility
                         $sender->setFlying(true);
                         $sender->setAllowFlight(true);
                         }
@@ -84,6 +89,7 @@ class VanishV2 extends PluginBase {
                     }
             }else{
                 unset(self::$vanish[array_search($name, self::$vanish)]);
+                self::$online[] = $sender;
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($sender);
                     $nameTag = self::$nametagg[$name];
@@ -94,6 +100,7 @@ class VanishV2 extends PluginBase {
                 }
                 if($this->getConfig()->get("enable-fly") === true){
                     if($sender->getGamemode() === 0){
+                        unset(self::$AllowCombatFly[array_search($name, self::$AllowCombatFly)]); //for BlazinFly compatibility
                         $sender->setFlying(false);
                         $sender->setAllowFlight(false);
                     }
