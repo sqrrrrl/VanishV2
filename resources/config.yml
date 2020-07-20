@@ -5,7 +5,7 @@
 #     FakeJoin-message: "§e%name joined the game"
 
 # Do not change this!
-config-version: 1
+config-version: 2
 
 # The message that will be sent to online players when you turn on your vanish
 enable-leave: false
@@ -23,4 +23,10 @@ enable-fly: true
 
 # Choose if vanished players can take damage when they are in survival mode
 disable-damage: true
+
+# Choose if chest should be silent when you open them (Chests will be read-only)
+silent-chest: true
+
+# Choose if vanished players should lose hunger
+hunger: false
 ...
