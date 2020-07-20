@@ -17,7 +17,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\inventory\InventoryPickupItemEvent;
 use pocketmine\math\Vector3;
 use pocketmine\utils\TextFormat;
-use superbobby\VanishV2\libs\muqsit\invmenu\InvMenu;
+use muqsit\invmenu\InvMenu;
 
 use function array_search;
 use function in_array;

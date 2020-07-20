@@ -2,7 +2,7 @@
 
 namespace superbobby\VanishV2;
 
-use superbobby\VanishV2\libs\muqsit\invmenu\InvMenuHandler;
+use muqsit\invmenu\InvMenuHandler;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\PluginTask;
