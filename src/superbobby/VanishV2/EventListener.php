@@ -2,15 +2,22 @@
 
 namespace superbobby\VanishV2;
 
+use pocketmine\block\Block;
 use pocketmine\event\entity\EntityCombustEvent;
+use pocketmine\event\player\PlayerExhaustEvent;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\server\QueryRegenerateEvent;
+use pocketmine\inventory\DoubleChestInventory;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\inventory\InventoryPickupItemEvent;
+use pocketmine\math\Vector3;
+use pocketmine\utils\TextFormat;
+use superbobby\VanishV2\libs\muqsit\invmenu\InvMenu;
 
 use function array_search;
 use function in_array;
@@ -69,6 +76,15 @@ class EventListener implements Listener {
         }
     }
 
+    public function onExhaust(PlayerExhaustEvent $event) {
+        $player = $event->getPlayer();
+        if(in_array($player->getName(), VanishV2::$vanish)){
+            if ($this->plugin->getConfig()->get("hunger") === false){
+                $event->setCancelled();
+            }
+        }
+    }
+
     public function onJoin(PlayerJoinEvent $event){
             $player = $event->getPlayer();
             if(!in_array($player->getName(), VanishV2::$vanish)){
@@ -84,6 +100,43 @@ class EventListener implements Listener {
             if(in_array($p->getName(), VanishV2::$vanish)) {
                     $online = $event->getPlayerCount();
                     $event->setPlayerCount($online - 1);
+            }
+        }
+    }
+
+    public function onInteract(PlayerInteractEvent $event){
+        $player = $event->getPlayer();
+        $block = $event->getBlock()->getId();
+        $chest = $event->getBlock();
+        $tile = $chest->getLevel()->getTile(new Vector3($chest->x, $chest->y, $chest->z));
+        $action = $event->getAction();
+        if(in_array($player->getName(), VanishV2::$vanish)){
+            if($this->plugin->getConfig()->get("silent-chest") === true) {
+                if($block === Block::CHEST or $block === Block::TRAPPED_CHEST) {
+                    if($action === $event::RIGHT_CLICK_BLOCK) {
+                        if(!$player->isSneaking()) {
+                            $event->setCancelled();
+                            $name = $tile->getName();
+                            $inv = $tile->getInventory();
+                            $content = $tile->getInventory()->getContents();
+                            if($content != null) {
+                                if($inv instanceof DoubleChestInventory){
+                                    $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
+                                }else{
+                                    $menu = InvMenu::create(InvMenu::TYPE_CHEST);
+                                }
+                                $menu->getInventory()->setContents($content);
+                                $menu->readonly();
+                                $menu->setName($name);
+                                $menu->send($player);
+                            }else{
+                                $player->sendMessage(VanishV2::PREFIX . TextFormat::RED . "This chest is empty");
+                            }
+                        }else{
+                            $event->setCancelled();
+                        }
+                    }
+                }
             }
         }
     }

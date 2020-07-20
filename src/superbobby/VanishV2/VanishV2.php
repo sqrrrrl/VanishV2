@@ -2,6 +2,7 @@
 
 namespace superbobby\VanishV2;
 
+use superbobby\VanishV2\libs\muqsit\invmenu\InvMenuHandler;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\PluginTask;
@@ -38,7 +39,10 @@ class VanishV2 extends PluginBase {
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        if(!$this->getConfig()->get("config-version")){
+        if(!InvMenuHandler::isRegistered()){
+            InvMenuHandler::register($this);
+        }
+        if($this->getConfig()->get("config-version") === 1){
             $this->getLogger()->notice("Your configuration file is outdated you have to delete it to get the new update");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
@@ -54,12 +58,12 @@ class VanishV2 extends PluginBase {
 		case "vanish":
 		case "v":
 	        if(!$sender instanceof Player){
-                $sender->sendMessage(self::PREFIX . C::DARK_RED . "Use this command InGame.");
+                $sender->sendMessage(self::PREFIX . C::RED . "Use this command InGame.");
                 return false;
 	        }
 
 	        if(!$sender->hasPermission("vanish.use")){
-		        $sender->sendMessage(self::PREFIX . C::DARK_RED . "You do not have permission to use this command");
+		        $sender->sendMessage(self::PREFIX . C::RED . "You do not have permission to use this command");
                 return false;
 	        }
 
@@ -115,7 +119,7 @@ class VanishV2 extends PluginBase {
                         $msg = str_replace("%name", "$name", $msg);
                         $this->getServer()->broadcastMessage($msg);
 		        }
-               	    $sender->sendMessage(self::PREFIX . C::DARK_RED . "You are no longer vanished!");
+               	    $sender->sendMessage(self::PREFIX . C::RED . "You are no longer vanished!");
             }
         }
         return true;
