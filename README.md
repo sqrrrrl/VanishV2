@@ -1,10 +1,19 @@
 # VanishV2
 
-Unlike the others vanish plugins VanishV2 can hide the items you're holding and your armor you have on you,
+VanishV2 is an advanced vanish plugin with a lot of features
+* Hide the item/armor you are holding/wearing
+* Fake Join message/Fake leave message (configurable)
+* Option to disable damage when vanished
+* Option to allow survival fly when vanished
+* Remove you from the query list
+* Keep you vanished after leaving (configurable)
+* Remove you from the online player list in-game
+* You can't pick-up items when you are vanished
+* Option to see other vanished player with the permission vanish.see
 
-VanishV2 can remove you from the online players list to be incognito when you are checking for cheaters.
+Download ScoreHud addon <a href="https://github.com/superbobby2000/VanishV2/releases/download/ScoreHud/BasicAddon.php">Here</a>
 
-Finnally, with VanishV2 you can choose with the permission vanish.see who can see you when you're vanished.
+Download BlazinFly fixed version for VanishV2 <a href="https://github.com/superbobby2000/VanishV2/releases/download/BlazinFly/BlazinFly_v1.8.7.phar">Here</a>
 
 [![](https://poggit.pmmp.io/shield.state/VanishV2)](https://poggit.pmmp.io/p/VanishV2)
 
