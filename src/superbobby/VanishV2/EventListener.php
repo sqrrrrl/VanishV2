@@ -104,13 +104,13 @@ class EventListener implements Listener {
         }
     }
 
-    public function onInteract(PlayerInteractEvent $event){
+    public function onInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
         $block = $event->getBlock()->getId();
         $chest = $event->getBlock();
         $tile = $chest->getLevel()->getTile(new Vector3($chest->x, $chest->y, $chest->z));
         $action = $event->getAction();
-        if(in_array($player->getName(), VanishV2::$vanish)){
+        if(in_array($player->getName(), VanishV2::$vanish)) {
             if($this->plugin->getConfig()->get("silent-chest") === true) {
                 if($block === Block::CHEST or $block === Block::TRAPPED_CHEST) {
                     if($action === $event::RIGHT_CLICK_BLOCK) {
@@ -120,7 +120,7 @@ class EventListener implements Listener {
                             $inv = $tile->getInventory();
                             $content = $tile->getInventory()->getContents();
                             if($content != null) {
-                                if($inv instanceof DoubleChestInventory){
+                                if($inv instanceof DoubleChestInventory) {
                                     $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
                                 }else{
                                     $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -132,9 +132,9 @@ class EventListener implements Listener {
                             }else{
                                 $player->sendMessage(VanishV2::PREFIX . TextFormat::RED . "This chest is empty");
                             }
-                        }else{
-                            $event->setCancelled();
                         }
+                    }else{
+                        $event->setCancelled();
                     }
                 }
             }
