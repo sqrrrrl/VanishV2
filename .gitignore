@@ -1,0 +1,15 @@
+
+src/superbobby/VanishV2/libs/muqsit/invmenu/inventory/InvMenuInventory.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/InvMenu.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/InvMenuEventHandler.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/InvMenuHandler.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/MenuIds.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/metadata/DoubleBlockMenuMetadata.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/metadata/MenuMetadata.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/metadata/SingleBlockMenuMetadata.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/session/MenuExtradata.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/session/PlayerManager.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/session/PlayerNetwork.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/session/PlayerSession.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/SessionizedInvMenu.php
+src/superbobby/VanishV2/libs/muqsit/invmenu/SharedInvMenu.php
