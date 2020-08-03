@@ -2,7 +2,7 @@ name: VanishV2
 main: superbobby\VanishV2\VanishV2
 api: 3.0.0
 mcpe-protocol: [407]
-version: "1.10"
+version: "1.11"
 author: superbobby
 commands:
   vanish:
@@ -13,6 +13,9 @@ commands:
 permissions:
   vanish.use:
     description: "Permission to use the vanish command"
+    default: op
+  vanish.use.other:
+    description: "Permission to vanish other player"
     default: op
   vanish.see:
      description: "Permission to see vanished players"
