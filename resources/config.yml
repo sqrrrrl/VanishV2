@@ -13,10 +13,11 @@
 #     unvanish-other: "§cUnvanished %name"
 #     vanished-other: "§aYou are now vanished."
 #     unvanished-other: "§cYou are no longer vanished!"
+#     hud-message: "§aYou are currently vanished"
 
 
 # Do not change this!
-config-version: 3
+config-version: 4
 
 # The message that will be sent to online players when you turn on your vanish
 enable-leave: false
@@ -41,6 +42,9 @@ unvanish-other: "§cUnvanished %name"
 # Choose the message that will be sent to the player when another player vanish him
 vanished-other: "§aYou are now vanished."
 unvanished-other: "§cYou are no longer vanished!"
+
+# Choose the hud message that will be shown when you are vanished
+hud-message: "§aYou are currently vanished"
 
 # Choose if the player should be unvanished when he leave the server
 unvanish-after-leaving: false
