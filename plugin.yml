@@ -1,8 +1,7 @@
 name: VanishV2
 main: superbobby\VanishV2\VanishV2
-api: 3.0.0
-mcpe-protocol: [408]
-version: "1.13"
+api: [3.0.0, 4.0.0]
+version: "1.14"
 author: superbobby
 commands:
   vanish:
