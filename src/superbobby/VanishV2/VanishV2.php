@@ -37,12 +37,18 @@ class VanishV2 extends PluginBase {
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        if(!InvMenuHandler::isRegistered()){
-            InvMenuHandler::register($this);
+        if(!class_exists(InvMenuHandler::class)){
+            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit");
+            $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if($this->getConfig()->get("config-version") < 4 or $this->getConfig()->get("config-version") == null){
             $this->getLogger()->error("Your configuration file is outdated you have to delete it to get the new update");
             $this->getServer()->getPluginManager()->disablePlugin($this);
+        }
+        if(class_exists(InvMenuHandler::class)) {
+            if (!InvMenuHandler::isRegistered()) {
+                InvMenuHandler::register($this);
+            }
         }
     }
 
