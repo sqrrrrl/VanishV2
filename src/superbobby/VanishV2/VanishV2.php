@@ -38,7 +38,7 @@ class VanishV2 extends PluginBase {
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
         if(!class_exists(InvMenuHandler::class)){
-            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit");
+            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommanded)");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if($this->getConfig()->get("config-version") < 4 or $this->getConfig()->get("config-version") == null){
