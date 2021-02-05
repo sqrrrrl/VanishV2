@@ -126,7 +126,7 @@ class EventListener implements Listener {
                                     $menu = InvMenu::create(InvMenu::TYPE_CHEST);
                                 }
                                 $menu->getInventory()->setContents($content);
-                                $menu->readonly();
+                                $menu->setListener(InvMenu::readonly());
                                 $menu->setName($name);
                                 $menu->send($player);
                             }else{
