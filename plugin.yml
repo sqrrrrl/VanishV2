@@ -20,4 +20,3 @@ permissions:
   vanish.see:
      description: "Permission to see vanished players"
      default: op
-test
