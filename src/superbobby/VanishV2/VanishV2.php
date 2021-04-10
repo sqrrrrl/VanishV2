@@ -69,7 +69,7 @@ class VanishV2 extends PluginBase {
 	        if(count($args) > 1){
 	            $sender->sendMessage(self::PREFIX . TextFormat::RED . "Usage: /vanish <player>");
 	            return false;
-            }
+            	}
 
 	        if(!$sender->hasPermission("vanish.use")){
 		        $sender->sendMessage(TextFormat::RED . "You do not have permission to use this command");
