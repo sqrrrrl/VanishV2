@@ -11,6 +11,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
+use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
+use Ifera\ScoreHud\scoreboard\ScoreTag;
 
 use function array_search;
 use function in_array;
@@ -29,16 +31,29 @@ class VanishV2 extends PluginBase {
 
     public $pk;
 
+    public $newScorehud; //ScoreHud >= 6.0.0 compatibility
+
     protected static $main;
 
     public function onEnable() {
         self::$main = $this;
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
+        if($this->getServer()->getPluginManager()->getPlugin('ScoreHud')){
+            $scorehud_version = floatval($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion());
+            if($scorehud_version >= 6.0){
+                $this->getServer()->getPluginManager()->registerEvents(new TagResolveListener, $this);
+                $this->newScorehud = true;
+            }else{
+                $this->newScorehud = false;
+            }
+        }else{
+            $this->newScorehud = false;
+        }
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
         if(!class_exists(InvMenuHandler::class)){
-            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommanded)");
+            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommended)");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if($this->getConfig()->get("config-version") < 4 or $this->getConfig()->get("config-version") == null){
@@ -84,47 +99,63 @@ class VanishV2 extends PluginBase {
             }
 
             if (count($args) === 0) {
-                if (!in_array($name, self::$vanish)) {
+                if(!in_array($name, self::$vanish)) {
                     self::$vanish[] = $name;
                     unset(self::$online[array_search($sender, self::$online, True)]);
                     $sender->sendMessage(self::PREFIX . $this->getConfig()->get("vanish-message"));
                     $nameTag = $sender->getNameTag();
                     self::$nametagg[$name] = $nameTag;
                     $sender->setNameTag("§6[V]§r $nameTag");
-                    if ($this->getConfig()->get("enable-leave") === true) {
+                    if($this->newScorehud == true){
+                        foreach($this->getServer()->getOnlinePlayers() as $players) {
+                            if ($players->isOnline()) {
+                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                $ev->call();
+                            }
+                        }
+                    }
+                    if($this->getConfig()->get("enable-leave") === true) {
                         $msg = $this->getConfig()->get("FakeLeave-message");
                         $msg = str_replace("%name", "$name", $msg);
                         $this->getServer()->broadcastMessage($msg);
                     }
-                    if ($this->getConfig()->get("enable-fly") === true) {
-                        if ($sender->getGamemode() === 0) {
+                    if($this->getConfig()->get("enable-fly") === true) {
+                        if($sender->getGamemode() === 0) {
                             self::$AllowCombatFly[] = $name; //for BlazinFly compatibility
                             $sender->setFlying(true);
                             $sender->setAllowFlight(true);
                         }
                     }
                     foreach ($this->getServer()->getOnlinePlayers() as $players) {
-                        if ($players->hasPermission("vanish.see")) {
+                        if($players->hasPermission("vanish.see")) {
                             $msg = $this->getConfig()->get("vanish");
                             $msg = str_replace("%name", "$name", $msg);
                             $players->sendMessage($msg);
                         }
                     }
-                } else {
+                }else{
                     unset(self::$vanish[array_search($name, self::$vanish)]);
                     self::$online[] = $sender;
                     foreach ($this->getServer()->getOnlinePlayers() as $players) {
                         $players->showPlayer($sender);
                         $nameTag = self::$nametagg[$name];
                         $sender->setNameTag("$nameTag");
+                        if($this->newScorehud == true){
+                            foreach($this->getServer()->getOnlinePlayers() as $players) {
+                                if ($players->isOnline()) {
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                    $ev->call();
+                                }
+                            }
+                        }
                         if ($players->hasPermission("vanish.see")) {
                             $msg = $this->getConfig()->get("unvanish");
                             $msg = str_replace("%name", "$name", $msg);
                             $players->sendMessage($msg);
                         }
                     }
-                    if ($this->getConfig()->get("enable-fly") === true) {
-                        if ($sender->getGamemode() === 0) {
+                    if($this->getConfig()->get("enable-fly") === true) {
+                        if($sender->getGamemode() === 0) {
                             unset(self::$AllowCombatFly[array_search($name, self::$AllowCombatFly)]); //for BlazinFly compatibility
                             $sender->setFlying(false);
                             $sender->setAllowFlight(false);
@@ -135,7 +166,7 @@ class VanishV2 extends PluginBase {
                     $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
                     foreach ($this->getServer()->getOnlinePlayers() as $p)
                         $p->sendDataPacket($pk);
-                    if ($this->getConfig()->get("enable-join") === true) {
+                    if($this->getConfig()->get("enable-join") === true) {
                         $msg = $this->getConfig()->get("FakeJoin-message");
                         $msg = str_replace("%name", "$name", $msg);
                         $this->getServer()->broadcastMessage($msg);
@@ -143,12 +174,12 @@ class VanishV2 extends PluginBase {
                     $sender->sendMessage(self::PREFIX . $this->getConfig()->get("unvanish-message"));
                 }
             }
-            if (count($args) === 1){
+            if(count($args) === 1){
                 $player = $this->getServer()->getPlayer($args[0]);
-                if ($player != null) {
+                if($player != null) {
                     $name = $player->getName();
                     $othername = $sender->getName();
-                    if (!in_array($name, self::$vanish)) {
+                    if(!in_array($name, self::$vanish)) {
                         self::$vanish[] = $name;
                         unset(self::$online[array_search($player, self::$online, True)]);
                         $msg = $this->getConfig()->get("vanish-other");
@@ -160,20 +191,28 @@ class VanishV2 extends PluginBase {
                         $nameTag = $player->getNameTag();
                         self::$nametagg[$name] = $nameTag;
                         $player->setNameTag("§6[V]§r $nameTag");
-                        if ($this->getConfig()->get("enable-leave") === true) {
+                        if($this->newScorehud == true){
+                            foreach($this->getServer()->getOnlinePlayers() as $players) {
+                                if ($players->isOnline()) {
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                    $ev->call();
+                                }
+                            }
+                        }
+                        if($this->getConfig()->get("enable-leave") === true) {
                             $msg = $this->getConfig()->get("FakeLeave-message");
                             $msg = str_replace("%name", "$name", $msg);
                             $this->getServer()->broadcastMessage($msg);
                         }
-                        if ($this->getConfig()->get("enable-fly") === true) {
-                            if ($player->getGamemode() === 0) {
+                        if($this->getConfig()->get("enable-fly") === true) {
+                            if($player->getGamemode() === 0) {
                                 self::$AllowCombatFly[] = $name; //for BlazinFly compatibility
                                 $player->setFlying(true);
                                 $player->setAllowFlight(true);
                             }
                         }
                         foreach ($this->getServer()->getOnlinePlayers() as $players) {
-                            if ($players->hasPermission("vanish.see")) {
+                            if($players->hasPermission("vanish.see")) {
                                 $msg = $this->getConfig()->get("vanish");
                                 $msg = str_replace("%name", "$name", $msg);
                                 $players->sendMessage($msg);
@@ -186,13 +225,21 @@ class VanishV2 extends PluginBase {
                             $players->showPlayer($player);
                             $nameTag = self::$nametagg[$name];
                             $player->setNameTag("$nameTag");
-                            if ($players->hasPermission("vanish.see")) {
+                            if($this->newScorehud == true){
+                                foreach($this->getServer()->getOnlinePlayers() as $players) {
+                                    if ($players->isOnline()) {
+                                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                        $ev->call();
+                                    }
+                                }
+                            }
+                            if($players->hasPermission("vanish.see")) {
                                 $msg = $this->getConfig()->get("unvanish");
                                 $msg = str_replace("%name", "$name", $msg);
                                 $players->sendMessage($msg);                            }
                         }
-                        if ($this->getConfig()->get("enable-fly") === true) {
-                            if ($player->getGamemode() === 0) {
+                        if($this->getConfig()->get("enable-fly") === true) {
+                            if($player->getGamemode() === 0) {
                                 unset(self::$AllowCombatFly[array_search($name, self::$AllowCombatFly)]); //for BlazinFly compatibility
                                 $player->setFlying(false);
                                 $player->setAllowFlight(false);
@@ -203,7 +250,7 @@ class VanishV2 extends PluginBase {
                         $pk->entries[] = PlayerListEntry::createAdditionEntry($player->getUniqueId(), $player->getId(), $player->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($player->getSkin()), $player->getXuid());
                         foreach ($this->getServer()->getOnlinePlayers() as $p)
                             $p->sendDataPacket($pk);
-                        if ($this->getConfig()->get("enable-join") === true) {
+                        if($this->getConfig()->get("enable-join") === true) {
                             $msg = $this->getConfig()->get("FakeJoin-message");
                             $msg = str_replace("%name", "$name", $msg);
                             $this->getServer()->broadcastMessage($msg);

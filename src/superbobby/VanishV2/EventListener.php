@@ -18,6 +18,8 @@ use pocketmine\event\inventory\InventoryPickupItemEvent;
 use pocketmine\math\Vector3;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenu;
+use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
+use Ifera\ScoreHud\scoreboard\ScoreTag;
 
 use function array_search;
 use function in_array;
@@ -33,13 +35,21 @@ class EventListener implements Listener {
     public function onQuit(PlayerQuitEvent $event) {
         $player = $event->getPlayer();
         $name = $player->getName();
-        if (in_array($name, VanishV2::$vanish)) {
-            if ($this->plugin->getConfig()->get("unvanish-after-leaving") === true) {
+        if(in_array($name, VanishV2::$vanish)) {
+            if($this->plugin->getConfig()->get("unvanish-after-leaving") === true) {
                 unset(VanishV2::$vanish[array_search($name, VanishV2::$vanish)]);
             }
         }
         if(in_array($player, VanishV2::$online, true)){
             unset(VanishV2::$online[array_search($player, VanishV2::$online, true)]);
+            if($this->plugin->newScorehud == true){
+                foreach($this->plugin->getServer()->getOnlinePlayers() as $players) {
+                    if ($players->isOnline()) {
+                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
+                        $ev->call();
+                    }
+                }
+            }
         }
     }
 
@@ -47,17 +57,17 @@ class EventListener implements Listener {
         $inv = $event->getInventory();
         $player = $inv->getHolder();
         $name = $player->getName();
-        if (in_array($name, VanishV2::$vanish)) {
+        if(in_array($name, VanishV2::$vanish)) {
             $event->setCancelled();
         }
     }
 
     public function onDamage(EntityDamageEvent $event) {
         $player = $event->getEntity();
-        if ($player instanceof Player) {
+        if($player instanceof Player) {
             $name = $player->getName();
-            if (in_array($name, VanishV2::$vanish)) {
-                if ($this->plugin->getConfig()->get("disable-damage") === true) {
+            if(in_array($name, VanishV2::$vanish)) {
+                if($this->plugin->getConfig()->get("disable-damage") === true) {
                     $event->setCancelled();
                 }
             }
@@ -66,10 +76,10 @@ class EventListener implements Listener {
 
     public function onPlayerBurn(EntityCombustEvent $event) {
         $player = $event->getEntity();
-        if ($player instanceof Player) {
+        if($player instanceof Player) {
             $name = $player->getName();
-            if (in_array($name, VanishV2::$vanish)) {
-                if ($this->plugin->getConfig()->get("disable-damage") === true) {
+            if(in_array($name, VanishV2::$vanish)) {
+                if($this->plugin->getConfig()->get("disable-damage") === true) {
                     $event->setCancelled();
                 }
             }
@@ -79,24 +89,32 @@ class EventListener implements Listener {
     public function onExhaust(PlayerExhaustEvent $event) {
         $player = $event->getPlayer();
         if(in_array($player->getName(), VanishV2::$vanish)){
-            if ($this->plugin->getConfig()->get("hunger") === false){
+            if($this->plugin->getConfig()->get("hunger") === false){
                 $event->setCancelled();
             }
         }
     }
 
     public function onJoin(PlayerJoinEvent $event){
-            $player = $event->getPlayer();
-            if(!in_array($player->getName(), VanishV2::$vanish)){
-                if(!in_array($player, VanishV2::$online, true)) {
-                    VanishV2::$online[] = $player;
+        $player = $event->getPlayer();
+        if(!in_array($player->getName(), VanishV2::$vanish)){
+            if(!in_array($player, VanishV2::$online, true)) {
+                VanishV2::$online[] = $player;
+                if($this->plugin->newScorehud == true){
+                    foreach($this->plugin->getServer()->getOnlinePlayers() as $players) {
+                        if($players->isOnline()) {
+                            $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
+                            $ev->call();
+                        }
+                    }
                 }
             }
+        }
     }
 
     public function onQuery(QueryRegenerateEvent $event) {
         $event->setPlayerList(VanishV2::$online);
-        foreach (Server::getInstance()->getOnlinePlayers() as $p) {
+        foreach(Server::getInstance()->getOnlinePlayers() as $p) {
             if(in_array($p->getName(), VanishV2::$vanish)) {
                     $online = $event->getPlayerCount();
                     $event->setPlayerCount($online - 1);
