@@ -57,7 +57,7 @@ class VanishV2 extends PluginBase {
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if($this->getConfig()->get("config-version") < 4 or $this->getConfig()->get("config-version") == null){
-            $this->getLogger()->error("Your configuration file is outdated you have to delete it to get the new update");
+            $this->getLogger()->error("Your configuration file is outdated you have to delete it to get the new config");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if(class_exists(InvMenuHandler::class)) {
