@@ -13,7 +13,7 @@ VanishV2 is an advanced vanish plugin with a lot of features
 
 If you're using ScoreHud v6.0.0+ use the tag {VanishV2.fake_count}
 
-f you're using ScoreHud v5.2.0 or under download ScoreHud addon <a href="https://github.com/superbobby2000/VanishV2/releases/download/ScoreHud/BasicAddon.php">here</a>
+If you're using ScoreHud v5.2.0 or under download ScoreHud addon <a href="https://github.com/superbobby2000/VanishV2/releases/download/ScoreHud/BasicAddon.php">here</a>
 
 Download BlazinFly fixed version for VanishV2 <a href="https://github.com/superbobby2000/VanishV2/releases/download/BlazinFly/BlazinFly_v1.8.7.phar">here</a>
 

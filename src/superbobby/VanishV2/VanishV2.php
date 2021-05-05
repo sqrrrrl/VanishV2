@@ -140,18 +140,18 @@ class VanishV2 extends PluginBase {
                         $players->showPlayer($sender);
                         $nameTag = self::$nametagg[$name];
                         $sender->setNameTag("$nameTag");
-                        if($this->newScorehud == true){
-                            foreach($this->getServer()->getOnlinePlayers() as $players) {
-                                if ($players->isOnline()) {
-                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                                    $ev->call();
-                                }
-                            }
-                        }
                         if ($players->hasPermission("vanish.see")) {
                             $msg = $this->getConfig()->get("unvanish");
                             $msg = str_replace("%name", "$name", $msg);
                             $players->sendMessage($msg);
+                        }
+                    }
+                    if($this->newScorehud == true){
+                        foreach($this->getServer()->getOnlinePlayers() as $players) {
+                            if ($players->isOnline()) {
+                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                $ev->call();
+                            }
                         }
                     }
                     if($this->getConfig()->get("enable-fly") === true) {
@@ -225,18 +225,19 @@ class VanishV2 extends PluginBase {
                             $players->showPlayer($player);
                             $nameTag = self::$nametagg[$name];
                             $player->setNameTag("$nameTag");
-                            if($this->newScorehud == true){
-                                foreach($this->getServer()->getOnlinePlayers() as $players) {
-                                    if ($players->isOnline()) {
-                                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                                        $ev->call();
-                                    }
-                                }
-                            }
                             if($players->hasPermission("vanish.see")) {
                                 $msg = $this->getConfig()->get("unvanish");
                                 $msg = str_replace("%name", "$name", $msg);
-                                $players->sendMessage($msg);                            }
+                                $players->sendMessage($msg);
+                            }
+                        }
+                        if($this->newScorehud == true){
+                            foreach($this->getServer()->getOnlinePlayers() as $players) {
+                                if ($players->isOnline()) {
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                    $ev->call();
+                                }
+                            }
                         }
                         if($this->getConfig()->get("enable-fly") === true) {
                             if($player->getGamemode() === 0) {
