@@ -45,8 +45,13 @@ class EventListener implements Listener {
             if($this->plugin->newScorehud == true){
                 foreach($this->plugin->getServer()->getOnlinePlayers() as $players) {
                     if ($players->isOnline()) {
-                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
-                        $ev->call();
+                        if (!$players->hasPermission('vanish.see')) {
+                            $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
+                            $ev->call();
+                        }else{
+                            $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->plugin->getServer()->getOnlinePlayers()))));
+                            $ev->call();
+                        }
                     }
                 }
             }
@@ -103,8 +108,13 @@ class EventListener implements Listener {
                 if($this->plugin->newScorehud == true){
                     foreach($this->plugin->getServer()->getOnlinePlayers() as $players) {
                         if($players->isOnline()) {
-                            $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
-                            $ev->call();
+                            if(!$players->hasPermission('vanish.see')) {
+                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
+                                $ev->call();
+                            }else{
+                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->plugin->getServer()->getOnlinePlayers()))));
+                                $ev->call();
+                            }
                         }
                     }
                 }

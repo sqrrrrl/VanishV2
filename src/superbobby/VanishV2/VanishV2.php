@@ -61,7 +61,7 @@ class VanishV2 extends PluginBase {
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if(class_exists(InvMenuHandler::class)) {
-            if (!InvMenuHandler::isRegistered()) {
+            if(!InvMenuHandler::isRegistered()) {
                 InvMenuHandler::register($this);
             }
         }
@@ -109,8 +109,13 @@ class VanishV2 extends PluginBase {
                     if($this->newScorehud == true){
                         foreach($this->getServer()->getOnlinePlayers() as $players) {
                             if ($players->isOnline()) {
-                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                                $ev->call();
+                                if(!$players->hasPermission("vanish.see")) {
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                    $ev->call();
+                                }else{
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
+                                    $ev->call();
+                                }
                             }
                         }
                     }
@@ -149,8 +154,13 @@ class VanishV2 extends PluginBase {
                     if($this->newScorehud == true){
                         foreach($this->getServer()->getOnlinePlayers() as $players) {
                             if ($players->isOnline()) {
-                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                                $ev->call();
+                                if(!$players->hasPermission('vanish.see')) {
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                    $ev->call();
+                                }else{
+                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
+                                    $ev->call();
+                                }
                             }
                         }
                     }
@@ -163,9 +173,15 @@ class VanishV2 extends PluginBase {
                     }
                     $pk = new PlayerListPacket();
                     $pk->type = PlayerListPacket::TYPE_ADD;
-                    $pk->entries[] = PlayerListEntry::createAdditionEntry($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($sender->getSkin()), $sender->getXuid());
-                    foreach ($this->getServer()->getOnlinePlayers() as $p)
+                    $pk->entries[] = PlayerListEntry::createAdditionEntry(
+                        $sender->getUniqueId(),
+                        $sender->getId(),
+                        $sender->getDisplayName(),
+                        SkinAdapterSingleton::get()->toSkinData($sender->getSkin()),
+                        $sender->getXuid());
+                    foreach($this->getServer()->getOnlinePlayers() as $p) {
                         $p->sendDataPacket($pk);
+                    }
                     if($this->getConfig()->get("enable-join") === true) {
                         $msg = $this->getConfig()->get("FakeJoin-message");
                         $msg = str_replace("%name", "$name", $msg);
@@ -193,9 +209,14 @@ class VanishV2 extends PluginBase {
                         $player->setNameTag("§6[V]§r $nameTag");
                         if($this->newScorehud == true){
                             foreach($this->getServer()->getOnlinePlayers() as $players) {
-                                if ($players->isOnline()) {
-                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                                    $ev->call();
+                                if($players->isOnline()) {
+                                    if(!$players->hasPermission("vanish.see")) {
+                                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                        $ev->call();
+                                    }else{
+                                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
+                                        $ev->call();
+                                    }
                                 }
                             }
                         }
@@ -234,8 +255,13 @@ class VanishV2 extends PluginBase {
                         if($this->newScorehud == true){
                             foreach($this->getServer()->getOnlinePlayers() as $players) {
                                 if ($players->isOnline()) {
-                                    $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                                    $ev->call();
+                                    if(!$players->hasPermission('vanish.see')) {
+                                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+                                        $ev->call();
+                                    }else{
+                                        $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
+                                        $ev->call();
+                                    }
                                 }
                             }
                         }
@@ -248,9 +274,15 @@ class VanishV2 extends PluginBase {
                         }
                         $pk = new PlayerListPacket();
                         $pk->type = PlayerListPacket::TYPE_ADD;
-                        $pk->entries[] = PlayerListEntry::createAdditionEntry($player->getUniqueId(), $player->getId(), $player->getDisplayName(), SkinAdapterSingleton::get()->toSkinData($player->getSkin()), $player->getXuid());
-                        foreach ($this->getServer()->getOnlinePlayers() as $p)
+                        $pk->entries[] = PlayerListEntry::createAdditionEntry(
+                            $player->getUniqueId(),
+                            $player->getId(),
+                            $player->getDisplayName(),
+                            SkinAdapterSingleton::get()->toSkinData($player->getSkin()),
+                            $player->getXuid());
+                        foreach($this->getServer()->getOnlinePlayers() as $p){
                             $p->sendDataPacket($pk);
+                        }
                         if($this->getConfig()->get("enable-join") === true) {
                             $msg = $this->getConfig()->get("FakeJoin-message");
                             $msg = str_replace("%name", "$name", $msg);
