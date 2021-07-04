@@ -18,15 +18,13 @@ use pocketmine\event\inventory\InventoryPickupItemEvent;
 use pocketmine\math\Vector3;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenu;
-use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
-use Ifera\ScoreHud\scoreboard\ScoreTag;
 
 use function array_search;
 use function in_array;
 
 class EventListener implements Listener {
 
-    private $plugin;
+    private VanishV2 $plugin;
 
     public function __construct(VanishV2 $plugin) {
         $this->plugin = $plugin;
@@ -36,25 +34,13 @@ class EventListener implements Listener {
         $player = $event->getPlayer();
         $name = $player->getName();
         if(in_array($name, VanishV2::$vanish)) {
-            if($this->plugin->getConfig()->get("unvanish-after-leaving") === true) {
+            if($this->plugin->getConfig()->get("unvanish-after-leaving")) {
                 unset(VanishV2::$vanish[array_search($name, VanishV2::$vanish)]);
             }
         }
         if(in_array($player, VanishV2::$online, true)){
             unset(VanishV2::$online[array_search($player, VanishV2::$online, true)]);
-            if($this->plugin->newScorehud == true){
-                foreach($this->plugin->getServer()->getOnlinePlayers() as $players) {
-                    if ($players->isOnline()) {
-                        if (!$players->hasPermission('vanish.see')) {
-                            $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
-                            $ev->call();
-                        }else{
-                            $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->plugin->getServer()->getOnlinePlayers()))));
-                            $ev->call();
-                        }
-                    }
-                }
-            }
+            $this->plugin->updateHudPlayerCount();
         }
     }
 
@@ -72,7 +58,7 @@ class EventListener implements Listener {
         if($player instanceof Player) {
             $name = $player->getName();
             if(in_array($name, VanishV2::$vanish)) {
-                if($this->plugin->getConfig()->get("disable-damage") === true) {
+                if($this->plugin->getConfig()->get("disable-damage")) {
                     $event->setCancelled();
                 }
             }
@@ -84,7 +70,7 @@ class EventListener implements Listener {
         if($player instanceof Player) {
             $name = $player->getName();
             if(in_array($name, VanishV2::$vanish)) {
-                if($this->plugin->getConfig()->get("disable-damage") === true) {
+                if($this->plugin->getConfig()->get("disable-damage")) {
                     $event->setCancelled();
                 }
             }
@@ -94,7 +80,7 @@ class EventListener implements Listener {
     public function onExhaust(PlayerExhaustEvent $event) {
         $player = $event->getPlayer();
         if(in_array($player->getName(), VanishV2::$vanish)){
-            if($this->plugin->getConfig()->get("hunger") === false){
+            if(!$this->plugin->getConfig()->get("hunger")){
                 $event->setCancelled();
             }
         }
@@ -105,19 +91,7 @@ class EventListener implements Listener {
         if(!in_array($player->getName(), VanishV2::$vanish)){
             if(!in_array($player, VanishV2::$online, true)) {
                 VanishV2::$online[] = $player;
-                if($this->plugin->newScorehud == true){
-                    foreach($this->plugin->getServer()->getOnlinePlayers() as $players) {
-                        if($players->isOnline()) {
-                            if(!$players->hasPermission('vanish.see')) {
-                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count(VanishV2::$online))));
-                                $ev->call();
-                            }else{
-                                $ev = new PlayerTagUpdateEvent($players, new ScoreTag("VanishV2.fake_count", strval(count($this->plugin->getServer()->getOnlinePlayers()))));
-                                $ev->call();
-                            }
-                        }
-                    }
-                }
+                $this->plugin->updateHudPlayerCount();
             }
         }
     }
@@ -139,7 +113,7 @@ class EventListener implements Listener {
         $tile = $chest->getLevel()->getTile(new Vector3($chest->x, $chest->y, $chest->z));
         $action = $event->getAction();
         if(in_array($player->getName(), VanishV2::$vanish)) {
-            if($this->plugin->getConfig()->get("silent-chest") === true) {
+            if($this->plugin->getConfig()->get("silent-chest")) {
                 if($block === Block::CHEST or $block === Block::TRAPPED_CHEST) {
                     if($action === $event::RIGHT_CLICK_BLOCK) {
                         if(!$player->isSneaking()) {
