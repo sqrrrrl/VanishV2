@@ -142,4 +142,32 @@ class EventListener implements Listener {
             }
         }
     }
+
+    public function silentJoin(PlayerJoinEvent $event) {
+        if ($event->getPlayer()->hasPermission("vanish.silent")) {
+            if ($this->plugin->getConfig()->get("silent-join-leave")["join"]) {
+                if (!$this->plugin->getConfig()->get("silent-join-leave")["vanished-only"]) {
+                    $event->setJoinMessage(null);
+                }else{
+                    if (in_array($event->getPlayer()->getName(), VanishV2::$vanish)){
+                        $event->setJoinMessage(null);
+                    }
+                }
+            }
+        }
+    }
+
+    public function silentLeave(PlayerQuitEvent $event) {
+        if ($event->getPlayer()->hasPermission("vanish.silent")) {
+            if ($this->plugin->getConfig()->get("silent-join-leave")["leave"]) {
+                if (!$this->plugin->getConfig()->get("silent-join-leave")["vanished-only"]) {
+                    $event->setQuitMessage(null);
+                }else{
+                    if (in_array($event->getPlayer()->getName(), VanishV2::$vanish)){
+                        $event->setQuitMessage(null);
+                    }
+                }
+            }
+        }
+    }
 }

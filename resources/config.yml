@@ -17,13 +17,13 @@
 
 
 # Do not change this!
-config-version: 4
+config-version: 5
 
-# The message that will be sent to online players when you turn on your vanish
+# The message that will be sent to online players when you turn on vanish
 enable-leave: false
 FakeLeave-message: "§e%name left the game"
 
-# The message that will be sent to online players when you turn off your vanish
+# The message that will be sent to online players when you turn off vanish
 enable-join: false
 FakeJoin-message: "§e%name joined the game"
 
@@ -60,4 +60,12 @@ silent-chest: true
 
 # Choose if vanished players should lose hunger
 hunger: false
+
+# Choose if the join/leave message should appear when a player with the permission vanish.silent joins the server
+# (Only compatible with default join/leave message)
+silent-join-leave:
+  join: true
+  leave: true
+  #Choose if this should only apply to players who are already vanished
+  vanished-only: true
 ...

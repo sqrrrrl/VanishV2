@@ -20,3 +20,6 @@ permissions:
   vanish.see:
      description: "Permission to see vanished players"
      default: op
+  vanish.silent:
+    description: "Permission to silently join the server"
+    default: op
