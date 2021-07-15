@@ -143,6 +143,10 @@ class EventListener implements Listener {
         }
     }
 
+    /**
+     * @param PlayerJoinEvent $event
+     * @priority HIGHEST
+     */
     public function silentJoin(PlayerJoinEvent $event) {
         if ($event->getPlayer()->hasPermission("vanish.silent")) {
             if ($this->plugin->getConfig()->get("silent-join-leave")["join"]) {
@@ -157,6 +161,10 @@ class EventListener implements Listener {
         }
     }
 
+    /**
+     * @param PlayerQuitEvent $event
+     * @priority HIGHEST
+     */
     public function silentLeave(PlayerQuitEvent $event) {
         if ($event->getPlayer()->hasPermission("vanish.silent")) {
             if ($this->plugin->getConfig()->get("silent-join-leave")["leave"]) {
