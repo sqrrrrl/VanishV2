@@ -23,8 +23,6 @@ class VanishV2 extends PluginBase {
 
     public static array $vanish = [];
 
-    public static array $nametagg = [];
-
     public static array $online = [];
 
     public static array $AllowCombatFly = [];
@@ -116,9 +114,7 @@ class VanishV2 extends PluginBase {
     public function vanish(Player $player) {
         self::$vanish[] = $player->getName();
         unset(self::$online[array_search($player, self::$online, True)]);
-        $nameTag = $player->getNameTag();
-        self::$nametagg[$player->getName()] = $nameTag;
-        $player->setNameTag("§6[V]§r $nameTag");
+        $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
             $msg = $this->getConfig()->get("FakeLeave-message");
@@ -144,8 +140,7 @@ class VanishV2 extends PluginBase {
     public function unvanish(Player $player) {
         unset(self::$vanish[array_search($player->getName(), self::$vanish)]);
         self::$online[] = $player;
-        $nameTag = self::$nametagg[$player->getName()];
-        $player->setNameTag("$nameTag");
+        $player->setNameTag(str_replace("[V] ", null, $player->getNameTag()));
         $this->updateHudPlayerCount();
         foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) {
             $onlinePlayer->showPlayer($player);
