@@ -17,6 +17,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\inventory\InventoryPickupItemEvent;
 use pocketmine\math\Vector3;
 use pocketmine\utils\TextFormat;
+use pocketmine\scheduler\ClosureTask;
 use muqsit\invmenu\InvMenu;
 
 use function array_search;
@@ -40,7 +41,9 @@ class EventListener implements Listener {
         }
         if(in_array($player, VanishV2::$online, true)){
             unset(VanishV2::$online[array_search($player, VanishV2::$online, true)]);
-            $this->plugin->updateHudPlayerCount();
+            $this->plugin->getScheduler()->scheduleDelayedTask(new ClosureTask(function(int $i): void{
+                $this->plugin->updateHudPlayerCount();
+            }), 20);
         }
     }
 
@@ -93,6 +96,17 @@ class EventListener implements Listener {
                 VanishV2::$online[] = $player;
                 $this->plugin->updateHudPlayerCount();
             }
+        }
+    }
+
+    /**
+     * @param PlayerJoinEvent $event
+     * @priority HIGHEST
+     */
+    public function setNametag(PlayerJoinEvent $event){
+        $player = $event->getPlayer();
+        if (in_array($player->getName(), VanishV2::$vanish)){
+            $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         }
     }
 
