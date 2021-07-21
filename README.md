@@ -5,10 +5,10 @@ VanishV2 is an advanced vanish plugin with a lot of features
 * Fake Join message/Fake leave message (configurable)
 * Option to disable damage when vanished
 * Option to allow survival fly when vanished
-* Remove you from the query list
-* Keep you vanished after leaving (configurable)
-* Remove you from the online player list in-game
-* You can't pick-up items when you are vanished
+* Removes you from the query list
+* Keeps you vanished after leaving (configurable)
+* Removes you from the online player list in-game
+* Stops you from picking up items when you are vanished
 * Option to see other vanished player with the permission vanish.see
 * Option to silently join/leave the server
 
