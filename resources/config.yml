@@ -17,7 +17,7 @@
 
 
 # Do not change this!
-config-version: 5
+config-version: 6
 
 # The message that will be sent to online players when you turn on vanish
 enable-leave: false
@@ -49,6 +49,9 @@ hud-message: "§aYou are currently vanished"
 # Choose if the player should be unvanished when he leave the server
 unvanish-after-leaving: false
 
+# Choose if the player should be unvanished when the server restart
+unvanish-after-restart: false
+
 # Choose if vanished players can fly when they are in survival
 enable-fly: true
 
@@ -62,10 +65,9 @@ silent-chest: true
 hunger: false
 
 # Choose if the join/leave message should appear when a player with the permission vanish.silent joins the server
-# (Only compatible with default join/leave message)
 silent-join-leave:
   join: true
   leave: true
-  #Choose if this should only apply to players who are already vanished
+  # Choose if this should only apply to players who are already vanished
   vanished-only: true
 ...
