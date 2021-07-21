@@ -66,14 +66,13 @@ class VanishV2 extends PluginBase {
     }
 
     public function libsStuff(){
-        if (!class_exists(InvMenuHandler::class)) {
-            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommended)");
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-        }
         if (class_exists(InvMenuHandler::class)) {
             if (!InvMenuHandler::isRegistered()) {
                 InvMenuHandler::register($this);
             }
+        }else{
+            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommended)");
+            $this->getServer()->getPluginManager()->disablePlugin($this);
         }
     }
 
