@@ -7,6 +7,7 @@ VanishV2 is an advanced vanish plugin with a lot of features
 * Option to allow survival fly when vanished
 * Removes you from the query list
 * Keeps you vanished after leaving (configurable)
+* Keeps you vanished after server restart (configurable)
 * Removes you from the online player list in-game
 * Stops you from picking up items when you are vanished
 * Option to see other vanished player with the permission vanish.see

@@ -12,12 +12,18 @@ use function in_array;
 class VanishV2Task extends Task {
     public $pk;
 
+    private VanishV2 $plugin;
+
+    public function __construct(VanishV2 $plugin) {
+        $this->plugin = $plugin;
+    }
+
     public function onRun(int $currentTick){
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
             if($p->spawned){
                 if(in_array($p->getName(), VanishV2::$vanish)){
                     foreach(Server::getInstance()->getOnlinePlayers() as $player){
-                        $p->sendTip(VanishV2::getMain()->getConfig()->get("hud-message"));
+                        $p->sendTip($this->plugin->getConfig()->get("hud-message"));
 			            if($player->hasPermission("vanish.see")){
 			                $player->showPlayer($p);
 		                }else{

@@ -13,6 +13,7 @@ use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
 use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
 use Ifera\ScoreHud\scoreboard\ScoreTag;
+use pocketmine\utils\Config;
 
 use function array_search;
 use function in_array;
@@ -29,20 +30,44 @@ class VanishV2 extends PluginBase {
 
     public $pk;
 
-    protected static VanishV2 $main;
-
     public function onEnable() {
-        self::$main = $this;
+        $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task($this), 20);
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-        $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task(), 20);
+        $this->initConfig();
+        if ($this->isEnabled()) {
+            $this->libsStuff();
+        }
+    }
+
+    public function onDisable() {
+        if (!$this->getConfig()->get("unvanish-after-restart")) {
+            $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
+            $players = implode("\n", self::$vanish);
+            $file->set($players);
+            $file->save();
+        }
+    }
+
+    public function initConfig(){
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        if (!class_exists(InvMenuHandler::class)) {
-            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommended)");
+        if ($this->getConfig()->get("config-version") < 6 or $this->getConfig()->get("config-version") == null) {
+            $this->getLogger()->error("Your configuration file is outdated you have to delete it to get the new config");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
-        if ($this->getConfig()->get("config-version") < 5 or $this->getConfig()->get("config-version") == null) {
-            $this->getLogger()->error("Your configuration file is outdated you have to delete it to get the new config");
+        if (!$this->getConfig()->get("unvanish-after-restart")) {
+            $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
+            $players = $file->getAll(true);
+            foreach ($players as $player) {
+                self::$vanish[] = $player;
+            }
+            unlink($this->getDataFolder() . "vanished_players.txt");
+        }
+    }
+
+    public function libsStuff(){
+        if (!class_exists(InvMenuHandler::class)) {
+            $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommended)");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
         if (class_exists(InvMenuHandler::class)) {
@@ -52,19 +77,10 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    public static function getMain(): self {
-        return self::$main;
-    }
-
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
         switch (strtolower($command->getName())) {
             case "vanish":
             case "v":
-                if (!$sender instanceof Player) {
-                    $sender->sendMessage(self::PREFIX . TextFormat::RED . "Use this command InGame.");
-                    return false;
-                }
-
                 if (!$sender->hasPermission("vanish.use")) {
                     $sender->sendMessage(TextFormat::RED . "You do not have permission to use this command");
                     return false;
@@ -78,12 +94,16 @@ class VanishV2 extends PluginBase {
                 }
 
                 if (count($args) == 0) {
-                    if (!in_array($sender->getName(), self::$vanish)) {
-                        $this->vanish($sender);
-                        $sender->sendMessage(self::PREFIX . $this->getConfig()->get("vanish-message"));
+                    if ($sender instanceof Player) {
+                        if (!in_array($sender->getName(), self::$vanish)) {
+                            $this->vanish($sender);
+                            $sender->sendMessage(self::PREFIX . $this->getConfig()->get("vanish-message"));
+                        }else{
+                            $this->unvanish($sender);
+                            $sender->sendMessage(self::PREFIX . $this->getConfig()->get("unvanish-message"));
+                        }
                     }else{
-                        $this->unvanish($sender);
-                        $sender->sendMessage(self::PREFIX . $this->getConfig()->get("unvanish-message"));
+                        $sender->sendMessage(self::PREFIX . TextFormat::RED . "Use this command In-Game");
                     }
                 }else{
                     if (count($args) == 1) {
