@@ -12,6 +12,7 @@ VanishV2 is an advanced vanish plugin with a lot of features
 * Stops you from picking up items when you are vanished
 * Option to see other vanished player with the permission vanish.see
 * Option to silently join/leave the server
+* Stops players from sending private messages to vanished players
 
 If you're using ScoreHud v6.0.0+ use the tag {VanishV2.fake_count}
 
