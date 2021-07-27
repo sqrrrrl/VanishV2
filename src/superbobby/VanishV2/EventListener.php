@@ -4,6 +4,7 @@ namespace superbobby\VanishV2;
 
 use pocketmine\block\Block;
 use pocketmine\event\entity\EntityCombustEvent;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -47,7 +48,7 @@ class EventListener implements Listener {
         }
     }
 
-    public function PickUp(InventoryPickupItemEvent $event) {
+    public function pickUp(InventoryPickupItemEvent $event) {
         $inv = $event->getInventory();
         $player = $inv->getHolder();
         $name = $player->getName();
@@ -188,6 +189,22 @@ class EventListener implements Listener {
                     if (in_array($event->getPlayer()->getName(), VanishV2::$vanish)){
                         $event->setQuitMessage(null);
                     }
+                }
+            }
+        }
+    }
+
+    public function onCommandExecute(PlayerCommandPreprocessEvent $event){
+        $sender = $event->getPlayer();
+        if (!$this->plugin->getConfig()->get("can-send-msg")){
+            $message = $event->getMessage();
+            $message = explode(" ", $message);
+            if (in_array(array_shift($message), array("/tell", "/msg", "/w"))){
+                $receiver = $this->plugin->getServer()->getPlayer(array_shift($message));
+                if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver){
+                    $event->setCancelled();
+                    $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
+                    $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
                 }
             }
         }
