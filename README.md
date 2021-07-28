@@ -1,6 +1,8 @@
 # VanishV2
 
 VanishV2 is an advanced vanish plugin with a lot of features
+* Highly configurable
+* You can change every message from this plugin in the config
 * Hide the item/armor you are holding/wearing
 * Fake Join message/Fake leave message (configurable)
 * Option to disable damage when vanished

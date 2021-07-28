@@ -69,6 +69,9 @@ silent-chest: true
 # Choose if vanished players should lose hunger
 hunger: false
 
+# Choose if vanished players should have a night vision effect
+night-vision: true
+
 # Choose if the join/leave message should appear when a player with the permission vanish.silent joins the server
 silent-join-leave:
   join: true

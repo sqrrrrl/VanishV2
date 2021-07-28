@@ -2,6 +2,9 @@
 
 namespace superbobby\VanishV2;
 
+use pocketmine\entity\Effect;
+use pocketmine\entity\EffectInstance;
+use pocketmine\item\ItemFactory;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\Player;
@@ -186,6 +189,9 @@ class VanishV2 extends PluginBase {
                 $player->setFlying(false);
                 $player->setAllowFlight(false);
             }
+        }
+        if ($this->getConfig()->get("night-vision")){
+            $player->removeEffect(Effect::NIGHT_VISION);
         }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
