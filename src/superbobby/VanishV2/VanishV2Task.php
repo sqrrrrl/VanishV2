@@ -2,6 +2,8 @@
 
 namespace superbobby\VanishV2;
 
+use pocketmine\entity\Effect;
+use pocketmine\entity\EffectInstance;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\scheduler\Task;
@@ -24,6 +26,9 @@ class VanishV2Task extends Task {
                 if(in_array($p->getName(), VanishV2::$vanish)){
                     foreach(Server::getInstance()->getOnlinePlayers() as $player){
                         $p->sendTip($this->plugin->getConfig()->get("hud-message"));
+                        if ($this->plugin->getConfig()->get("night-vision")) {
+                            $p->addEffect(new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION), null, 0, false, true));
+                        }
 			            if($player->hasPermission("vanish.see")){
 			                $player->showPlayer($p);
 		                }else{
