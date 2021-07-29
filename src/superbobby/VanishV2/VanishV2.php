@@ -3,8 +3,6 @@
 namespace superbobby\VanishV2;
 
 use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
-use pocketmine\item\ItemFactory;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\Player;
