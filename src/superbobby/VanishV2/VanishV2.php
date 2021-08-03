@@ -3,8 +3,6 @@
 namespace superbobby\VanishV2;
 
 use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
-use pocketmine\item\ItemFactory;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\Player;
@@ -55,8 +53,11 @@ class VanishV2 extends PluginBase {
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
         if ($this->getConfig()->get("config-version") < 6 or $this->getConfig()->get("config-version") == null) {
-            $this->getLogger()->error("Your configuration file is outdated you have to delete it to get the new config");
-            $this->getServer()->getPluginManager()->disablePlugin($this);
+            $this->getLogger()->notice("Updating your config...");
+            rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
+            $this->saveDefaultConfig();
+            $this->getConfig()->reload();
+            $this->getLogger()->notice("Config updated!");
         }
         if (!$this->getConfig()->get("unvanish-after-restart")) {
             $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
