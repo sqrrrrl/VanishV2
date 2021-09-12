@@ -9,7 +9,6 @@ author: superbobby
 commands:
   vanish:
     description: "Enter vanish mode"
-    permission: "vanish.use"
     aliases:
     - v
 permissions:

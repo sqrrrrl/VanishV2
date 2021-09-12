@@ -2,8 +2,8 @@
 
 namespace superbobby\VanishV2;
 
-use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\scheduler\Task;
@@ -20,14 +20,14 @@ class VanishV2Task extends Task {
         $this->plugin = $plugin;
     }
 
-    public function onRun(int $currentTick){
+    public function onRun(): void{
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
             if($p->spawned){
                 if(in_array($p->getName(), VanishV2::$vanish)){
                     foreach(Server::getInstance()->getOnlinePlayers() as $player){
                         $p->sendTip($this->plugin->getConfig()->get("hud-message"));
                         if ($this->plugin->getConfig()->get("night-vision")) {
-                            $p->addEffect(new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION), null, 0, false, true));
+                            $p->getEffects()->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), null, 0, false, true));
                         }
 			            if($player->hasPermission("vanish.see")){
 			                $player->showPlayer($p);
@@ -39,7 +39,7 @@ class VanishV2Task extends Task {
 			                $pk = new PlayerListPacket();
 			                $pk->entries[] = $entry;
 			                $pk->type = PlayerListPacket::TYPE_REMOVE;
-			                $player->sendDataPacket($pk);
+			                $player->getNetworkSession()->sendDataPacket($pk);
 		                }
                     }
                 }

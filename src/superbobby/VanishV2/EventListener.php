@@ -2,24 +2,25 @@
 
 namespace superbobby\VanishV2;
 
-use pocketmine\block\Block;
+use pocketmine\block\Chest;
+use pocketmine\block\inventory\DoubleChestInventory;
+use pocketmine\block\TrappedChest;
 use pocketmine\event\entity\EntityCombustEvent;
+use pocketmine\event\entity\EntityItemPickupEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\server\QueryRegenerateEvent;
-use pocketmine\inventory\DoubleChestInventory;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\inventory\InventoryPickupItemEvent;
-use pocketmine\math\Vector3;
 use pocketmine\utils\TextFormat;
 use pocketmine\scheduler\ClosureTask;
 use muqsit\invmenu\InvMenu;
+use pocketmine\math\Vector3;
 
 use function array_search;
 use function in_array;
@@ -48,12 +49,11 @@ class EventListener implements Listener {
         }
     }
 
-    public function pickUp(InventoryPickupItemEvent $event) {
-        $inv = $event->getInventory();
-        $player = $inv->getHolder();
-        $name = $player->getName();
-        if(in_array($name, VanishV2::$vanish)) {
-            $event->setCancelled();
+    public function pickUp(EntityItemPickupEvent $event) {
+        if ($event->getEntity() instanceof Player) {
+            if (in_array($event->getEntity()->getName(), VanishV2::$vanish)) {
+                $event->cancel();
+            }
         }
     }
 
@@ -63,7 +63,7 @@ class EventListener implements Listener {
             $name = $player->getName();
             if(in_array($name, VanishV2::$vanish)) {
                 if($this->plugin->getConfig()->get("disable-damage")) {
-                    $event->setCancelled();
+                    $event->cancel();
                 }
             }
         }
@@ -75,7 +75,7 @@ class EventListener implements Listener {
             $name = $player->getName();
             if(in_array($name, VanishV2::$vanish)) {
                 if($this->plugin->getConfig()->get("disable-damage")) {
-                    $event->setCancelled();
+                    $event->cancel();
                 }
             }
         }
@@ -85,7 +85,7 @@ class EventListener implements Listener {
         $player = $event->getPlayer();
         if(in_array($player->getName(), VanishV2::$vanish)){
             if(!$this->plugin->getConfig()->get("hunger")){
-                $event->setCancelled();
+                $event->cancel();
             }
         }
     }
@@ -112,28 +112,28 @@ class EventListener implements Listener {
     }
 
     public function onQuery(QueryRegenerateEvent $event) {
-        $event->setPlayerList(VanishV2::$online);
+        $event->getQueryInfo()->setPlayerList(VanishV2::$online);
         foreach(Server::getInstance()->getOnlinePlayers() as $p) {
             if(in_array($p->getName(), VanishV2::$vanish)) {
-                    $online = $event->getPlayerCount();
-                    $event->setPlayerCount($online - 1);
+                    $online = $event->getQueryInfo()->getPlayerCount();
+                    $event->getQueryInfo()->setPlayerCount($online - 1);
             }
         }
     }
 
     public function onInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
-        $block = $event->getBlock()->getId();
+        $block = $event->getBlock();
         $chest = $event->getBlock();
-        $tile = $chest->getLevel()->getTile(new Vector3($chest->x, $chest->y, $chest->z));
+        $tile =  $chest->getPosition()->getWorld()->getTile(new Vector3($block->getPosition()->x, $block->getPosition()->y, $block->getPosition()->z));
         $action = $event->getAction();
         if(in_array($player->getName(), VanishV2::$vanish)) {
             if($this->plugin->getConfig()->get("silent-chest")) {
-                if($block === Block::CHEST or $block === Block::TRAPPED_CHEST) {
+                if($block instanceof TrappedChest or $block instanceof Chest) {
                     if($action === $event::RIGHT_CLICK_BLOCK) {
                         if(!$player->isSneaking()) {
-                            $event->setCancelled();
-                            $name = $tile->getName();
+                            $event->cancel();
+                            $name = $block->getName();
                             $inv = $tile->getInventory();
                             $content = $tile->getInventory()->getContents();
                             if($content != null) {
@@ -151,7 +151,7 @@ class EventListener implements Listener {
                             }
                         }
                     }else{
-                        $event->setCancelled();
+                        $event->cancel();
                     }
                 }
             }
@@ -200,9 +200,9 @@ class EventListener implements Listener {
             $message = $event->getMessage();
             $message = explode(" ", $message);
             if (in_array(array_shift($message), array("/tell", "/msg", "/w"))){
-                $receiver = $this->plugin->getServer()->getPlayer(array_shift($message));
+                $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
                 if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver){
-                    $event->setCancelled();
+                    $event->cancel();
                     $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
                     $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
                 }

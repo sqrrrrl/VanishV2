@@ -2,19 +2,19 @@
 
 namespace superbobby\VanishV2;
 
-use pocketmine\entity\Effect;
+use pocketmine\entity\effect\VanillaEffects;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
-use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
-use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
+use pocketmine\network\mcpe\convert\SkinAdapterSingleton;
 use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
 use Ifera\ScoreHud\scoreboard\ScoreTag;
 use pocketmine\utils\Config;
+use pocketmine\network\mcpe\protocol\PlayerListPacket;
 
 use function array_search;
 use function in_array;
@@ -31,7 +31,7 @@ class VanishV2 extends PluginBase {
 
     public $pk;
 
-    public function onEnable() {
+    public function onEnable(): void {
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task($this), 20);
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->initConfig();
@@ -40,7 +40,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    public function onDisable() {
+    public function onDisable(): void {
         if (!$this->getConfig()->get("unvanish-after-restart")) {
             $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
             $players = implode("\n", self::$vanish);
@@ -110,7 +110,7 @@ class VanishV2 extends PluginBase {
                     }
                 }else{
                     if (count($args) == 1) {
-                        $player = $this->getServer()->getPlayer($args[0]);
+                        $player = $this->getServer()->getPlayerByPrefix($args[0]);
                         if ($player != null) {
                             if (!in_array($player->getName(), self::$vanish)) {
                                 $this->vanish($player);
@@ -182,7 +182,7 @@ class VanishV2 extends PluginBase {
             SkinAdapterSingleton::get()->toSkinData($player->getSkin()),
             $player->getXuid());
         foreach ($this->getServer()->getOnlinePlayers() as $p) {
-            $p->sendDataPacket($pk);
+            $p->getNetworkSession()->sendDataPacket($pk);
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->getGamemode() == 0) {
@@ -192,7 +192,7 @@ class VanishV2 extends PluginBase {
             }
         }
         if ($this->getConfig()->get("night-vision")){
-            $player->removeEffect(Effect::NIGHT_VISION);
+            $player->getEffects()->remove(VanillaEffects::NIGHT_VISION());
         }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
