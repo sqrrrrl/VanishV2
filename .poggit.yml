@@ -6,7 +6,7 @@ projects:
   VanishV2:
     path: ""
     icon: icon.png
-    api: "4.0.0"
+    api: 4.0.0
     libs:
       - src: muqsit/InvMenu/InvMenu
         version: ^4.3.3
