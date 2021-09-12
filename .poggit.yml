@@ -1,6 +1,7 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/superbobby2000/VanishV2
 branches:
 - master
+- 4.0
 projects:
   VanishV2:
     path: ""
