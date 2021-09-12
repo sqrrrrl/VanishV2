@@ -3,6 +3,7 @@
 namespace superbobby\VanishV2;
 
 use pocketmine\entity\effect\VanillaEffects;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
@@ -145,7 +146,7 @@ class VanishV2 extends PluginBase {
             $this->getServer()->broadcastMessage($msg);
         }
         if ($this->getConfig()->get("enable-fly")) {
-            if ($player->getGamemode() == 0) {
+            if ($player->getGamemode() === GameMode::SURVIVAL()) {
                 self::$AllowCombatFly[] = $player->getName();
                 $player->setFlying(true);
                 $player->setAllowFlight(true);
