@@ -145,7 +145,7 @@ class VanishV2 extends PluginBase {
             $this->getServer()->broadcastMessage($msg);
         }
         if ($this->getConfig()->get("enable-fly")) {
-            if ($player->getGamemode() == 0) {
+            if ($player->getGamemode() === GameMode::SURVIVAL()) {
                 self::$AllowCombatFly[] = $player->getName();
                 $player->setFlying(true);
                 $player->setAllowFlight(true);
