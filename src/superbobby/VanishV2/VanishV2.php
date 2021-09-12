@@ -5,6 +5,7 @@ namespace superbobby\VanishV2;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
+use pocketmine\player\GameMode;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\plugin\PluginBase;
