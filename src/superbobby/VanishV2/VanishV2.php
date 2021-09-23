@@ -203,8 +203,7 @@ class VanishV2 extends PluginBase {
 
     public function checkHudVersion(): bool {
         if ($this->getServer()->getPluginManager()->getPlugin('ScoreHud')) {
-            $scorehud_version = floatval($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion());
-            if ($scorehud_version >= 6.0) {
+            if(version_compare($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion(), "6.0.0", ">=")){
                 $this->getServer()->getPluginManager()->registerEvents(new TagResolveListener, $this);
                 return true;
             }
