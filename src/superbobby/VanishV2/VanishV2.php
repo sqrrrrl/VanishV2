@@ -3,6 +3,7 @@
 namespace superbobby\VanishV2;
 
 use pocketmine\entity\Effect;
+use pocketmine\entity\EffectInstance;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\Player;
@@ -52,7 +53,7 @@ class VanishV2 extends PluginBase {
     public function initConfig(){
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        if ($this->getConfig()->get("config-version") < 6 or $this->getConfig()->get("config-version") == null) {
+        if ($this->getConfig()->get("config-version") < 7 or $this->getConfig()->get("config-version") == null) {
             $this->getLogger()->notice("Updating your config...");
             rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
             $this->saveDefaultConfig();
@@ -193,6 +194,13 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("night-vision")){
             $player->removeEffect(Effect::NIGHT_VISION);
+        }
+        foreach ($player->getEffects() as $effect){
+            $effect_duration = $effect->getDuration();
+            $effect_amplifier = $effect->getAmplifier();
+            $effect_id = $effect->getId();
+            $player->removeEffect($effect_id);
+            $player->addEffect(new EffectInstance(Effect::getEffect($effect_id), $effect_duration, $effect_amplifier, true));
         }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");

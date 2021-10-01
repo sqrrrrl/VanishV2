@@ -4,7 +4,7 @@ api: 3.0.0
 mcpe-protocol: [465]
 extensions:
   Core: '>=7.4'
-version: "2.4"
+version: "2.5"
 author: superbobby
 commands:
   vanish:
