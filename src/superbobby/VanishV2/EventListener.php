@@ -196,15 +196,28 @@ class EventListener implements Listener {
 
     public function onCommandExecute(PlayerCommandPreprocessEvent $event){
         $sender = $event->getPlayer();
-        if (!$this->plugin->getConfig()->get("can-send-msg")){
+        if (!$this->plugin->getConfig()->get("can-send-msg")) {
             $message = $event->getMessage();
             $message = explode(" ", $message);
-            if (in_array(array_shift($message), array("/tell", "/msg", "/w"))){
+            $command = array_shift($message);
+            if (in_array(strtolower($command), array("/tell", "/msg", "/w"))) {
                 $receiver = $this->plugin->getServer()->getPlayer(array_shift($message));
-                if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver){
+                if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver) {
                     $event->setCancelled();
                     $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
                     $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
+                }
+            }else{
+                if ($this->plugin->getConfig()->get("additional-commands")) {
+                    $command = substr($command, 1);
+                    if (array_key_exists(strtolower($command), $this->plugin->getConfig()->get("additional-commands"))) {
+                        $receiver = $this->plugin->getServer()->getPlayer(array_shift($message));
+                        if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver) {
+                            $event->setCancelled();
+                            $sender->sendMessage($this->plugin->getConfig()->get("additional-commands")[$command]["sender-error"]);
+                            $receiver->sendMessage(VanishV2::PREFIX . str_replace("%sender", $sender->getName(), $this->plugin->getConfig()->get("additional-commands")[$command]["receiver-message"]));
+                        }
+                    }
                 }
             }
         }

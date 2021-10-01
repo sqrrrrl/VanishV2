@@ -24,11 +24,16 @@ class VanishV2Task extends Task {
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
             if($p->spawned){
                 if(in_array($p->getName(), VanishV2::$vanish)){
-                    foreach(Server::getInstance()->getOnlinePlayers() as $player){
-                        $p->sendTip($this->plugin->getConfig()->get("hud-message"));
-                        if ($this->plugin->getConfig()->get("night-vision")) {
-                            $p->addEffect(new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION), null, 0, false, true));
+                    $p->sendTip($this->plugin->getConfig()->get("hud-message"));
+                    foreach ($p->getEffects() as $effect) {
+                        if ($effect->isVisible()) {
+                            $effect->setVisible(false);
                         }
+                    }
+                    if ($this->plugin->getConfig()->get("night-vision")) {
+                        $p->addEffect(new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION), null, 0, false));
+                    }
+                    foreach(Server::getInstance()->getOnlinePlayers() as $player){
 			            if($player->hasPermission("vanish.see")){
 			                $player->showPlayer($p);
 		                }else{
