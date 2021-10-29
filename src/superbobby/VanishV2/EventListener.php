@@ -201,11 +201,15 @@ class EventListener implements Listener {
             $message = explode(" ", $message);
             $command = array_shift($message);
             if (in_array(strtolower($command), array("/tell", "/msg", "/w"))) {
-                $receiver = $this->plugin->getServer()->getPlayer(array_shift($message));
-                if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver) {
-                    $event->setCancelled();
-                    $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
-                    $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
+                if (isset($message[0])) {
+                    $receiver = $this->plugin->getServer()->getPlayer(array_shift($message));
+                    if (isset($message[0]) and trim(implode(" ", $message)) != '') {
+                        if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver) {
+                            $event->setCancelled();
+                            $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
+                            $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
+                        }
+                    }
                 }
             }else{
                 if ($this->plugin->getConfig()->get("additional-commands")) {
