@@ -183,7 +183,7 @@ class VanishV2 extends PluginBase {
             SkinAdapterSingleton::get()->toSkinData($player->getSkin()),
             $player->getXuid());
         foreach ($this->getServer()->getOnlinePlayers() as $p) {
-            $p->sendDataPacket($pk);
+            $p->sendDataPacket(clone $pk);
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->getGamemode() == 0) {
