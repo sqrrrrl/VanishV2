@@ -44,6 +44,7 @@ class VanishV2Task extends Task {
 			                $pk = new PlayerListPacket();
 			                $pk->entries[] = $entry;
 			                $pk->type = PlayerListPacket::TYPE_REMOVE;
+					$pk->encode();
 			                $player->sendDataPacket($pk);
 		                }
                     }
