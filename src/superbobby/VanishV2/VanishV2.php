@@ -182,6 +182,7 @@ class VanishV2 extends PluginBase {
             $player->getDisplayName(),
             SkinAdapterSingleton::get()->toSkinData($player->getSkin()),
             $player->getXuid());
+        $pk->encode();
         foreach ($this->getServer()->getOnlinePlayers() as $p) {
             $p->sendDataPacket($pk);
         }
