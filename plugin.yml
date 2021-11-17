@@ -4,7 +4,7 @@ api: 3.0.0
 mcpe-protocol: [471]
 extensions:
   Core: '>=7.4'
-version: "2.7"
+version: "2.8"
 author: superbobby
 commands:
   vanish:
@@ -24,4 +24,7 @@ permissions:
      default: op
   vanish.silent:
     description: "Permission to silently join the server"
+    default: op
+  vanish.attack:
+    description: "allows you to attack players while vanished"
     default: op

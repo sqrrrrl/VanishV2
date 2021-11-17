@@ -53,7 +53,7 @@ class VanishV2 extends PluginBase {
     public function initConfig(){
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        if ($this->getConfig()->get("config-version") < 7 or $this->getConfig()->get("config-version") == null) {
+        if ($this->getConfig()->get("config-version") < 8 or $this->getConfig()->get("config-version") == null) {
             $this->getLogger()->notice("Updating your config...");
             rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
             $this->saveDefaultConfig();
