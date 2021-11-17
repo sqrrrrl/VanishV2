@@ -4,6 +4,7 @@ namespace superbobby\VanishV2;
 
 use pocketmine\block\Block;
 use pocketmine\event\entity\EntityCombustEvent;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -222,6 +223,19 @@ class EventListener implements Listener {
                             $receiver->sendMessage(VanishV2::PREFIX . str_replace("%sender", $sender->getName(), $this->plugin->getConfig()->get("additional-commands")[$command]["receiver-message"]));
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public function onAttack(EntityDamageByEntityEvent $event){
+        $damager = $event->getDamager();
+        $player = $event->getEntity();
+        if ($damager != null and $damager instanceof Player and $player instanceof Player){
+            if (!$damager->hasPermission("vanish.attack")){
+                if (in_array($damager->getName(), VanishV2::$vanish)){
+                    $damager->sendMessage($this->plugin->getConfig()->get("hit-no-permission"));
+                    $event->setCancelled();
                 }
             }
         }
