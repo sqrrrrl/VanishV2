@@ -34,19 +34,18 @@ class VanishV2Task extends Task {
                         $p->addEffect(new EffectInstance(Effect::getEffect(Effect::NIGHT_VISION), null, 0, false));
                     }
                     foreach(Server::getInstance()->getOnlinePlayers() as $player){
-			            if($player->hasPermission("vanish.see")){
-			                $player->showPlayer($p);
-		                }else{
-			                $player->hidePlayer($p);
-			                $entry = new PlayerListEntry();
-			                $entry->uuid = $p->getUniqueId();
-
-			                $pk = new PlayerListPacket();
-			                $pk->entries[] = $entry;
-			                $pk->type = PlayerListPacket::TYPE_REMOVE;
-                            		$pk->encode();
-			                $player->sendDataPacket($pk);
-		                }
+                        if($player->hasPermission("vanish.see")){
+                            $player->showPlayer($p);
+                        }else{
+                            $player->hidePlayer($p);
+                            $entry = new PlayerListEntry();
+                            $entry->uuid = $p->getUniqueId();
+                            $pk = new PlayerListPacket();
+                            $pk->entries[] = $entry;
+                            $pk->type = PlayerListPacket::TYPE_REMOVE;
+                            $pk->encode();
+                            $player->sendDataPacket($pk);
+                        }
                     }
                 }
             }
