@@ -1,7 +1,7 @@
 name: VanishV2
 main: superbobby\VanishV2\VanishV2
 api: 3.0.0
-mcpe-protocol: [471]
+mcpe-protocol: [475]
 extensions:
   Core: '>=7.4'
 version: "2.8"
