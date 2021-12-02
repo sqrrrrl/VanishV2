@@ -6,6 +6,7 @@ use pocketmine\block\Chest;
 use pocketmine\block\inventory\DoubleChestInventory;
 use pocketmine\block\TrappedChest;
 use pocketmine\event\entity\EntityCombustEvent;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityItemPickupEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
@@ -43,7 +44,7 @@ class EventListener implements Listener {
         }
         if(in_array($player, VanishV2::$online, true)){
             unset(VanishV2::$online[array_search($player, VanishV2::$online, true)]);
-            $this->plugin->getScheduler()->scheduleDelayedTask(new ClosureTask(function(int $i): void{
+            $this->plugin->getScheduler()->scheduleDelayedTask(new ClosureTask(function(): void{
                 $this->plugin->updateHudPlayerCount();
             }), 20);
         }
@@ -115,8 +116,8 @@ class EventListener implements Listener {
         $event->getQueryInfo()->setPlayerList(VanishV2::$online);
         foreach(Server::getInstance()->getOnlinePlayers() as $p) {
             if(in_array($p->getName(), VanishV2::$vanish)) {
-                    $online = $event->getQueryInfo()->getPlayerCount();
-                    $event->getQueryInfo()->setPlayerCount($online - 1);
+                $online = $event->getQueryInfo()->getPlayerCount();
+                $event->getQueryInfo()->setPlayerCount($online - 1);
             }
         }
     }
@@ -196,15 +197,45 @@ class EventListener implements Listener {
 
     public function onCommandExecute(PlayerCommandPreprocessEvent $event){
         $sender = $event->getPlayer();
-        if (!$this->plugin->getConfig()->get("can-send-msg")){
+        if (!$this->plugin->getConfig()->get("can-send-msg")) {
             $message = $event->getMessage();
             $message = explode(" ", $message);
-            if (in_array(array_shift($message), array("/tell", "/msg", "/w"))){
-                $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
-                if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver){
+            $command = array_shift($message);
+            if (in_array(strtolower($command), array("/tell", "/msg", "/w"))) {
+                if (isset($message[0])) {
+                    $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
+                    if (isset($message[0]) and trim(implode(" ", $message)) != '') {
+                        if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver) {
+                            $event->cancel();
+                            $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
+                            $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
+                        }
+                    }
+                }
+            }else{
+                if ($this->plugin->getConfig()->get("additional-commands")) {
+                    $command = substr($command, 1);
+                    if (array_key_exists(strtolower($command), $this->plugin->getConfig()->get("additional-commands"))) {
+                        $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
+                        if ($receiver and in_array($receiver->getName(), VanishV2::$vanish) and !$sender->hasPermission("vanish.see") and $sender !== $receiver) {
+                            $event->cancel();
+                            $sender->sendMessage($this->plugin->getConfig()->get("additional-commands")[$command]["sender-error"]);
+                            $receiver->sendMessage(VanishV2::PREFIX . str_replace("%sender", $sender->getName(), $this->plugin->getConfig()->get("additional-commands")[$command]["receiver-message"]));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function onAttack(EntityDamageByEntityEvent $event){
+        $damager = $event->getDamager();
+        $player = $event->getEntity();
+        if ($damager != null and $damager instanceof Player and $player instanceof Player){
+            if (!$damager->hasPermission("vanish.attack")){
+                if (in_array($damager->getName(), VanishV2::$vanish)){
+                    $damager->sendMessage($this->plugin->getConfig()->get("hit-no-permission"));
                     $event->cancel();
-                    $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
-                    $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
                 }
             }
         }

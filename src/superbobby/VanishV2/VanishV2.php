@@ -2,6 +2,7 @@
 
 namespace superbobby\VanishV2;
 
+use pocketmine\data\bedrock\EffectIdMap;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
@@ -16,6 +17,7 @@ use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
 use Ifera\ScoreHud\scoreboard\ScoreTag;
 use pocketmine\utils\Config;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
+use pocketmine\entity\effect\EffectInstance;
 
 use function array_search;
 use function in_array;
@@ -53,7 +55,7 @@ class VanishV2 extends PluginBase {
     public function initConfig(){
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        if ($this->getConfig()->get("config-version") < 6 or $this->getConfig()->get("config-version") == null) {
+        if ($this->getConfig()->get("config-version") < 8 or $this->getConfig()->get("config-version") == null) {
             $this->getLogger()->notice("Updating your config...");
             rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
             $this->saveDefaultConfig();
@@ -139,7 +141,6 @@ class VanishV2 extends PluginBase {
         self::$vanish[] = $player->getName();
         unset(self::$online[array_search($player, self::$online, True)]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
-        $player->setSilent(true);
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
             $msg = $this->getConfig()->get("FakeLeave-message");
@@ -197,6 +198,13 @@ class VanishV2 extends PluginBase {
         if ($this->getConfig()->get("night-vision")){
             $player->getEffects()->remove(VanillaEffects::NIGHT_VISION());
         }
+        foreach ($player->getEffects() as $effect){
+            $effect_duration = $effect->getDuration();
+            $effect_amplifier = $effect->getAmplifier();
+            $effect_id = $effect->getId();
+            $player->getEffects()->remove($effect_id);
+            $player->getEffects()->add(new EffectInstance(EffectIdMap::getInstance()->fromId($effect_id), $effect_duration, $effect_amplifier, true));
+        }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
             $msg = str_replace("%name", $player->getName(), $msg);
@@ -206,8 +214,7 @@ class VanishV2 extends PluginBase {
 
     public function checkHudVersion(): bool {
         if ($this->getServer()->getPluginManager()->getPlugin('ScoreHud')) {
-            $scorehud_version = floatval($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion());
-            if ($scorehud_version >= 6.0) {
+            if(version_compare($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion(), "6.0.0", ">=")){
                 $this->getServer()->getPluginManager()->registerEvents(new TagResolveListener, $this);
                 return true;
             }
