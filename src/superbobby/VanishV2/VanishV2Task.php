@@ -24,23 +24,28 @@ class VanishV2Task extends Task {
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
             if($p->spawned){
                 if(in_array($p->getName(), VanishV2::$vanish)){
-                    foreach(Server::getInstance()->getOnlinePlayers() as $player){
-                        $p->sendTip($this->plugin->getConfig()->get("hud-message"));
-                        if ($this->plugin->getConfig()->get("night-vision")) {
-                            $p->getEffects()->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), null, 0, false, true));
+                    $p->sendTip($this->plugin->getConfig()->get("hud-message"));
+                    $p->setSilent(true);
+                    foreach ($p->getEffects() as $effect) {
+                        if ($effect->isVisible()) {
+                            $effect->setVisible(false);
                         }
-			            if($player->hasPermission("vanish.see")){
-			                $player->showPlayer($p);
-		                }else{
-			                $player->hidePlayer($p);
-			                $entry = new PlayerListEntry();
-			                $entry->uuid = $p->getUniqueId();
-
-			                $pk = new PlayerListPacket();
-			                $pk->entries[] = $entry;
-			                $pk->type = PlayerListPacket::TYPE_REMOVE;
-			                $player->getNetworkSession()->sendDataPacket($pk);
-		                }
+                    }
+                    if ($this->plugin->getConfig()->get("night-vision")) {
+                        $p->getEffects()->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), null, 0, false));
+                    }
+                    foreach(Server::getInstance()->getOnlinePlayers() as $player){
+                        if($player->hasPermission("vanish.see")){
+                            $player->showPlayer($p);
+                        }else{
+                            $player->hidePlayer($p);
+                            $entry = new PlayerListEntry();
+                            $entry->uuid = $p->getUniqueId();
+                            $pk = new PlayerListPacket();
+                            $pk->entries[] = $entry;
+                            $pk->type = PlayerListPacket::TYPE_REMOVE;
+                            $player->getNetworkSession()->sendDataPacket($pk);
+                        }
                     }
                 }
             }

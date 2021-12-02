@@ -2,7 +2,7 @@
 # Color code list https://minecraft.tools/en/color-code.php
 # Use %name for the name of the player who vanished
 # use %other-name for the name of the player who vanished another player
-#   private messages config:
+#   private message config:
 #     use %sender for the message sender and %message for the content of the message
 #   Default Config:
 #     FakeLeave-message: "§e%name Left the game"
@@ -22,7 +22,7 @@
 
 
 # Do not change this!
-config-version: 6
+config-version: 8
 
 # The message that will be sent to online players when you turn on vanish
 enable-leave: false
@@ -48,10 +48,13 @@ unvanish-other: "§cUnvanished %name"
 vanished-other: "§aYou are now vanished."
 unvanished-other: "§cYou are no longer vanished!"
 
+# Choose the message that will be sent to vanished players who try to hit other players without the permissions
+hit-no-permission: "§cYou do not have permission to hit other players while vanished"
+
 # Choose the hud message that will be shown when you are vanished
 hud-message: "§aYou are currently vanished"
 
-# Choose if the player should be unvanished when he leave the server
+# Choose if the player should be unvanished when he leaves the server
 unvanish-after-leaving: false
 
 # Choose if the player should be unvanished when the server restart
@@ -85,4 +88,10 @@ can-send-msg: false
 messages:
   sender-error: "That player cannot be found"
   receiver-message: "§c%sender tried to send a message to you: §7%message"
+  # If you want to add commands that should be blocked when used on a vanished player
+additional-commands:
+# Example
+#  tpa:
+#    sender-error: "That player cannot be found"
+#    receiver-message: "§c%sender tried to send a tp request to you"
 ...
