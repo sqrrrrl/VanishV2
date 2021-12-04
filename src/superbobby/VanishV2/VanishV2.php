@@ -2,7 +2,7 @@
 
 namespace superbobby\VanishV2;
 
-use pocketmine\data\bedrock\EffectIdMap;
+use pocketmine\entity\effect\StringToEffectParser;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
@@ -203,7 +203,7 @@ class VanishV2 extends PluginBase {
             $effect_amplifier = $effect->getAmplifier();
             $effect_id = $effect->getId();
             $player->getEffects()->remove($effect_id);
-            $player->getEffects()->add(new EffectInstance(EffectIdMap::getInstance()->fromId($effect_id), $effect_duration, $effect_amplifier, true));
+            $player->getEffects()->add(new EffectInstance(StringToEffectParser::getInstance()->fromId($effect_id), $effect_duration, $effect_amplifier, true));
         }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
