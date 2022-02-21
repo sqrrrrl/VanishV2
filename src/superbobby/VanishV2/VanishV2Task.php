@@ -26,6 +26,7 @@ class VanishV2Task extends Task {
                 if(in_array($p->getName(), VanishV2::$vanish)){
                     $p->sendTip($this->plugin->getConfig()->get("hud-message"));
                     $p->setSilent(true);
+                    $p->getXpManager()->setCanAttractXpOrbs(false);
                     foreach ($p->getEffects() as $effect) {
                         if ($effect->isVisible()) {
                             $effect->setVisible(false);
