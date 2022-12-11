@@ -1,0 +1,13 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/sqrrrrl/VanishV2
+build-by-default: true
+branches:
+- master
+- PM4
+projects:
+  VanishV2:
+    path: ""
+    icon: icon.png
+    libs:
+      - src: muqsit/InvMenu/InvMenu
+        version: ^4.4.1
+        branch: "4.0"
