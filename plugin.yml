@@ -1,5 +1,5 @@
 name: VanishV2
-main: superbobby2000\VanishV2\VanishV2
+main: superbobby\VanishV2\VanishV2
 api: 4.12.1
 extensions:
   Core: '>=7.4'
