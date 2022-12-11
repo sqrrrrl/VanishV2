@@ -1,10 +1,10 @@
 name: VanishV2
-main: superbobby\VanishV2\VanishV2
-api: 4.1.0
+main: sqrrrrl\VanishV2\VanishV2
+api: 4.12.1
 extensions:
   Core: '>=7.4'
-version: "3.1.0"
-author: superbobby
+version: "3.2.0"
+author: sqrrrrl
 commands:
   vanish:
     description: "Enter vanish mode"
