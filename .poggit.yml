@@ -8,6 +8,6 @@ projects:
     icon: icon.png
     libs:
       - src: muqsit/InvMenu/InvMenu
-        version: ^4.3.3
+        version: ^4.4.1
         branch: "4.0"
 ...
