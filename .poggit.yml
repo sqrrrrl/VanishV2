@@ -3,21 +3,13 @@ build-by-default: true
 branches:
 - master
 - PM4
-<<<<<<< Updated upstream
-=======
 - PM5
->>>>>>> Stashed changes
 projects:
   VanishV2:
     path: ""
     icon: icon.png
     libs:
       - src: muqsit/InvMenu/InvMenu
-<<<<<<< Updated upstream
-        version: ^4.4.1
-        branch: "4.0"
-=======
         version: ^4.6.1
         branch: "pm5"
 ...
->>>>>>> Stashed changes
