@@ -171,17 +171,9 @@ class VanishV2 extends PluginBase {
                 $onlinePlayer->sendMessage($msg);
             }
         }
-        $skinAdapter = new LegacySkinAdapter();
-        $pk = new PlayerListPacket();
-        $pk->type = PlayerListPacket::TYPE_ADD;
-        $pk->entries[] = PlayerListEntry::createAdditionEntry(
-            $player->getUniqueId(),
-            $player->getId(),
-            $player->getDisplayName(),
-            $skinAdapter->toSkinData($player->getSkin()),
-            $player->getXuid());
-        foreach ($this->getServer()->getOnlinePlayers() as $p) {
-            $p->getNetworkSession()->sendDataPacket($pk);
+        foreach($this->getServer()->getOnlinePlayers() as $p) {
+            $networkSession = $p->getNetworkSession();
+            $networkSession->sendDataPacket(PlayerListPacket::add([PlayerListEntry::createAdditionEntry($player->getUniqueId(), $player->getId(), $player->getDisplayName(), $networkSession->getTypeConverter()->getSkinAdapter()->toSkinData($player->getSkin()))]));
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->getGamemode() === GameMode::SURVIVAL()) {
