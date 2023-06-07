@@ -25,11 +25,6 @@ class VanishV2Task extends Task {
                     $p->sendTip($this->plugin->getConfig()->get("hud-message"));
                     $p->setSilent(true);
                     $p->getXpManager()->setCanAttractXpOrbs(false);
-                    foreach ($p->getEffects() as $effect) {
-                        if ($effect->isVisible()) {
-                            $effect->setVisible(false);
-                        }
-                    }
                     if ($this->plugin->getConfig()->get("night-vision")) {
                         $p->getEffects()->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), null, 0, false));
                     }
