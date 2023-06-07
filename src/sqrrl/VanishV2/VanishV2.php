@@ -194,10 +194,10 @@ class VanishV2 extends PluginBase {
         foreach ($player->getEffects()->all() as $effect){
             $effect_duration = $effect->getDuration();
             $effect_amplifier = $effect->getAmplifier();
-            $effect_id = $effect->getId();
+            $effect_type = $effect->getType();
             $effect_isvisible = $effect->isVisible();
-            $player->getEffects()->remove($effect_id);
-            $player->getEffects()->add(new EffectInstance(StringToEffectParser::getInstance()->fromId($effect_id), $effect_duration, $effect_amplifier, $effect_isvisible));
+            $player->getEffects()->remove($effect_type);
+            $player->getEffects()->add(new EffectInstance($effect_type, $effect_duration, $effect_amplifier, $effect_isvisible));
         }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
