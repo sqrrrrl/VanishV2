@@ -38,12 +38,7 @@ class VanishV2Task extends Task {
                             $player->showPlayer($p);
                         }else{
                             $player->hidePlayer($p);
-                            $entry = new PlayerListEntry();
-                            $entry->uuid = $p->getUniqueId();
-                            $pk = new PlayerListPacket();
-                            $pk->entries[] = $entry;
-                            $pk->type = PlayerListPacket::TYPE_REMOVE;
-                            $player->getNetworkSession()->sendDataPacket($pk);
+                            $player->getNetworkSession()->sendDataPacket(PlayerListPacket::remove([PlayerListEntry::createRemovalEntry($p->getUniqueId())]));
                         }
                     }
                 }

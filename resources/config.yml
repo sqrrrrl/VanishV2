@@ -89,6 +89,7 @@ messages:
   sender-error: "That player cannot be found"
   receiver-message: "§c%sender tried to send a message to you: §7%message"
   # If you want to add commands that should be blocked when used on a vanished player
+  # The commands CANNOT begin with a slash
 additional-commands:
 # Example
 #  tpa:
