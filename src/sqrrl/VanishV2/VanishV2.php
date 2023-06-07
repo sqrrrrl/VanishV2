@@ -191,14 +191,6 @@ class VanishV2 extends PluginBase {
         if ($this->getConfig()->get("night-vision")){
             $player->getEffects()->remove(VanillaEffects::NIGHT_VISION());
         }
-        foreach ($player->getEffects()->all() as $effect){
-            $effect_duration = $effect->getDuration();
-            $effect_amplifier = $effect->getAmplifier();
-            $effect_type = $effect->getType();
-            $effect_isvisible = $effect->isVisible();
-            $player->getEffects()->remove($effect_type);
-            $player->getEffects()->add(new EffectInstance($effect_type, $effect_duration, $effect_amplifier, $effect_isvisible));
-        }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
             $msg = str_replace("%name", $player->getName(), $msg);
