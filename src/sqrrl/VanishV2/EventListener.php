@@ -203,6 +203,9 @@ class EventListener implements Listener {
 
     public function onCommandExecute(CommandEvent $event){
         $sender = $event->getSender();
+        if (!$sender instanceof Player) {
+            return;
+        }
         if (!$this->plugin->getConfig()->get("can-send-msg")) {
             $message = $event->getCommand();
             $message = explode(" ", $message);
