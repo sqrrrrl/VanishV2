@@ -141,7 +141,7 @@ class VanishV2 extends PluginBase {
             $this->getServer()->broadcastMessage($msg);
         }
         if ($this->getConfig()->get("enable-fly")) {
-            if ($player->getGamemode() === GameMode::SURVIVAL()) {
+            if ($player->getGamemode()->equals(GameMode::SURVIVAL())) {
                 self::$AllowCombatFly[] = $player->getName();
                 $player->setFlying(true);
                 $player->setAllowFlight(true);
@@ -176,7 +176,7 @@ class VanishV2 extends PluginBase {
             $networkSession->sendDataPacket(PlayerListPacket::add([PlayerListEntry::createAdditionEntry($player->getUniqueId(), $player->getId(), $player->getDisplayName(), $networkSession->getTypeConverter()->getSkinAdapter()->toSkinData($player->getSkin()))]));
         }
         if ($this->getConfig()->get("enable-fly")) {
-            if ($player->getGamemode() === GameMode::SURVIVAL()) {
+            if ($player->getGamemode()->equals(GameMode::SURVIVAL())) {
                 unset(self::$AllowCombatFly[array_search($player->getName(), self::$AllowCombatFly)]);
                 $player->setFlying(false);
                 $player->setAllowFlight(false);
