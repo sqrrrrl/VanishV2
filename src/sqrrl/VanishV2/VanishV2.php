@@ -191,7 +191,7 @@ class VanishV2 extends PluginBase {
         if ($this->getConfig()->get("night-vision")){
             $player->getEffects()->remove(VanillaEffects::NIGHT_VISION());
         }
-        foreach ($player->getEffects() as $effect){
+        foreach ($player->getEffects()->all() as $effect){
             $effect_duration = $effect->getDuration();
             $effect_amplifier = $effect->getAmplifier();
             $effect_id = $effect->getId();
