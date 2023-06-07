@@ -4,10 +4,8 @@ namespace sqrrl\VanishV2;
 
 use pocketmine\entity\effect\StringToEffectParser;
 use pocketmine\entity\effect\VanillaEffects;
-use pocketmine\network\mcpe\convert\LegacySkinAdapter;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
-use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
@@ -141,7 +139,7 @@ class VanishV2 extends PluginBase {
             $this->getServer()->broadcastMessage($msg);
         }
         if ($this->getConfig()->get("enable-fly")) {
-            if ($player->getGamemode()->equals(GameMode::SURVIVAL())) {
+            if ($player->isSurvival()) {
                 self::$AllowCombatFly[] = $player->getName();
                 $player->setFlying(true);
                 $player->setAllowFlight(true);
@@ -173,10 +171,18 @@ class VanishV2 extends PluginBase {
         }
         foreach($this->getServer()->getOnlinePlayers() as $p) {
             $networkSession = $p->getNetworkSession();
-            $networkSession->sendDataPacket(PlayerListPacket::add([PlayerListEntry::createAdditionEntry($player->getUniqueId(), $player->getId(), $player->getDisplayName(), $networkSession->getTypeConverter()->getSkinAdapter()->toSkinData($player->getSkin()))]));
+            $networkSession->sendDataPacket(
+                PlayerListPacket::add([
+                    PlayerListEntry::createAdditionEntry(
+                        $player->getUniqueId(),
+                        $player->getId(),
+                        $player->getDisplayName(),
+                        $networkSession->getTypeConverter()->getSkinAdapter()->toSkinData($player->getSkin()),
+                        $player->getXuid()
+                )]));
         }
         if ($this->getConfig()->get("enable-fly")) {
-            if ($player->getGamemode()->equals(GameMode::SURVIVAL())) {
+            if ($player->isSurvival()) {
                 unset(self::$AllowCombatFly[array_search($player->getName(), self::$AllowCombatFly)]);
                 $player->setFlying(false);
                 $player->setAllowFlight(false);

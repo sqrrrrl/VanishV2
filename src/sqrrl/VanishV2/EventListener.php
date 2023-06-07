@@ -4,7 +4,6 @@ namespace sqrrl\VanishV2;
 
 use pocketmine\block\Chest;
 use pocketmine\block\inventory\DoubleChestInventory;
-use pocketmine\block\TrappedChest;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
