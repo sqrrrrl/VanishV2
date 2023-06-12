@@ -197,8 +197,8 @@ class VanishV2 extends PluginBase {
     }
 
     public function checkHudVersion(): bool {
-        if ($this->getServer()->getPluginManager()->getPlugin('ScoreHud')) {
-            if(version_compare($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion(), "6.0.0", ">=")){
+        if ($this->getServer()->getPluginManager()->getPlugin("ScoreHud")) {
+            if(version_compare($this->getServer()->getPluginManager()->getPlugin("ScoreHud")->getDescription()->getVersion(), "6.0.0", ">=")){
                 $this->getServer()->getPluginManager()->registerEvents(new TagResolveListener, $this);
                 return true;
             }
@@ -210,7 +210,7 @@ class VanishV2 extends PluginBase {
         if ($this->checkHudVersion()) {
             foreach ($this->getServer()->getOnlinePlayers() as $player) {
                 if ($player->isOnline()) {
-                    if (!$player->hasPermission('vanish.see')) {
+                    if (!$player->hasPermission("vanish.see")) {
                         $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
                     }else{
                         $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
