@@ -129,7 +129,7 @@ class VanishV2 extends PluginBase {
 
     public function vanish(Player $player) {
         self::$vanish[] = $player->getName();
-        unset(self::$online[array_search($player->getName(), self::$online, True)]);
+        unset(self::$online[array_search($player->getName(), self::$online, true)]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
