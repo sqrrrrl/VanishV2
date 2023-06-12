@@ -14,7 +14,7 @@ use pocketmine\command\CommandSender;
 use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
 use Ifera\ScoreHud\scoreboard\ScoreTag;
 use pocketmine\utils\Config;
-use pocketmine\entity\effect\EffectInstance;
+
 
 use function array_search;
 use function in_array;
