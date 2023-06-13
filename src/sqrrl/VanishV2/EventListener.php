@@ -209,14 +209,14 @@ class EventListener implements Listener {
             $message = $event->getCommand();
             $message = explode(" ", $message);
             $command = array_shift($message);
-            if (in_array(strtolower($command), array("tell", "msg", "w"))) {
+            if (in_array(strtolower($command), ["tell", "msg", "w"])) {
                 if (isset($message[0])) {
                     $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
                     if ($receiver && trim(implode(" ", $message)) !== "") {
                         if (in_array($receiver->getName(), VanishV2::$vanish) && !$sender->hasPermission("vanish.see") && $sender !== $receiver) {
                             $event->cancel();
                             $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
-                            $receiver->sendMessage(VanishV2::PREFIX . str_replace(array("%sender", "%message"), array($sender->getName(), implode(" ", $message)), $this->plugin->getConfig()->get("messages")["receiver-message"]));
+                            $receiver->sendMessage(VanishV2::PREFIX . str_replace(["%sender", "%message"], [$sender->getName(), implode(" ", $message)], $this->plugin->getConfig()->get("messages")["receiver-message"]));
                         }
                     }
                 }

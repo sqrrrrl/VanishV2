@@ -2,7 +2,6 @@
 
 namespace sqrrl\VanishV2;
 
-use pocketmine\entity\effect\StringToEffectParser;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
@@ -15,7 +14,6 @@ use pocketmine\command\CommandSender;
 use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
 use Ifera\ScoreHud\scoreboard\ScoreTag;
 use pocketmine\utils\Config;
-use pocketmine\entity\effect\EffectInstance;
 
 use function array_search;
 use function in_array;
@@ -130,7 +128,7 @@ class VanishV2 extends PluginBase {
 
     public function vanish(Player $player) {
         self::$vanish[] = $player->getName();
-        unset(self::$online[array_search($player->getName(), self::$online, True)]);
+        unset(self::$online[array_search($player->getName(), self::$online, true)]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
@@ -199,8 +197,8 @@ class VanishV2 extends PluginBase {
     }
 
     public function checkHudVersion(): bool {
-        if ($this->getServer()->getPluginManager()->getPlugin('ScoreHud')) {
-            if(version_compare($this->getServer()->getPluginManager()->getPlugin('ScoreHud')->getDescription()->getVersion(), "6.0.0", ">=")){
+        if ($this->getServer()->getPluginManager()->getPlugin("ScoreHud")) {
+            if(version_compare($this->getServer()->getPluginManager()->getPlugin("ScoreHud")->getDescription()->getVersion(), "6.0.0", ">=")){
                 $this->getServer()->getPluginManager()->registerEvents(new TagResolveListener, $this);
                 return true;
             }
@@ -212,7 +210,7 @@ class VanishV2 extends PluginBase {
         if ($this->checkHudVersion()) {
             foreach ($this->getServer()->getOnlinePlayers() as $player) {
                 if ($player->isOnline()) {
-                    if (!$player->hasPermission('vanish.see')) {
+                    if (!$player->hasPermission("vanish.see")) {
                         $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
                     }else{
                         $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
