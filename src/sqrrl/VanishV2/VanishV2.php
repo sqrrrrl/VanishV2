@@ -124,7 +124,7 @@ class VanishV2 extends PluginBase {
         return true;
     }
 
-    private function vanish(Player $player) {
+    public function vanish(Player $player) {
         self::$vanish[] = $player->getName();
         unset(self::$online[array_search($player->getName(), self::$online, true)]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
@@ -149,7 +149,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    private function unvanish(Player $player) {
+    public function unvanish(Player $player) {
         unset(self::$vanish[array_search($player->getName(), self::$vanish)]);
         self::$online[] = $player->getName();
         $player->setNameTag(str_replace("[V] ", "", $player->getNameTag()));
