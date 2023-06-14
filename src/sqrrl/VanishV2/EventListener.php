@@ -287,10 +287,6 @@ class EventListener implements Listener {
                         $player->getWorld()->dropItem($event->getBlock()->getPosition()->add(0.5, 0.5, 0.5), $drop);
                     }
                 }
-                $tile = $block->getPosition()->getWorld()->getTile($block->getPosition());
-                if($tile !== null){
-                    $tile->onBlockDestroyed();
-                }
                 $item = $player->getInventory()->getItemInHand();
                 $returnedItems = [];
                 $item->onDestroyBlock($block, $returnedItems);
