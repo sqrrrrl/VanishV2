@@ -128,15 +128,15 @@ class EventListener implements Listener {
 
     public function onInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
-        $tile =  $event->getBlock()->getPosition()->getWorld()->getTile($block->getPosition());
+        $tile =  $event->getBlock()->getPosition()->getWorld()->getTile($event->getBlock()->getPosition());
         $action = $event->getAction();
         if(in_array($player->getName(), VanishV2::$vanish)) {
             if($this->plugin->getConfig()->get("silent-chest")) {
-                if($block instanceof Chest) {
+                if($event->getBlock() instanceof Chest) {
                     if($action === $event::RIGHT_CLICK_BLOCK) {
                         if(!$player->isSneaking()) {
                             $event->cancel();
-                            $name = $block->getName();
+                            $name = $event->getBlock()->getName();
                             $inv = $tile->getInventory();
                             $content = $inv->getContents();
                             if($content !== null) {
