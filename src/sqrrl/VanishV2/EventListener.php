@@ -30,13 +30,9 @@ use function in_array;
 
 class EventListener implements Listener {
 
-    private VanishV2 $plugin;
-
     private static array $silentBlocks = [];
 
-    public function __construct(VanishV2 $plugin) {
-        $this->plugin = $plugin;
-    }
+    public function __construct(private VanishV2 $plugin){}
 
     public function onQuit(PlayerQuitEvent $event) {
         $player = $event->getPlayer();
