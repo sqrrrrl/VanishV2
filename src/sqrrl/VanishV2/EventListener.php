@@ -129,9 +129,7 @@ class EventListener implements Listener {
 
     public function onInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
-        $block = $event->getBlock();
-        $chest = $event->getBlock();
-        $tile =  $chest->getPosition()->getWorld()->getTile(new Vector3($block->getPosition()->x, $block->getPosition()->y, $block->getPosition()->z));
+        $tile =  $event->getBlock()->getPosition()->getWorld()->getTile($block->getPosition());
         $action = $event->getAction();
         if(in_array($player->getName(), VanishV2::$vanish)) {
             if($this->plugin->getConfig()->get("silent-chest")) {
@@ -142,7 +140,7 @@ class EventListener implements Listener {
                             $name = $block->getName();
                             $inv = $tile->getInventory();
                             $content = $tile->getInventory()->getContents();
-                            if($content != null) {
+                            if($content !== null) {
                                 if($inv instanceof DoubleChestInventory) {
                                     $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
                                 }else{
