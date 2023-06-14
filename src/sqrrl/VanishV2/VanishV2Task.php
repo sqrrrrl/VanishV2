@@ -12,11 +12,8 @@ use pocketmine\Server;
 use function in_array;
 
 class VanishV2Task extends Task {
-    private VanishV2 $plugin;
 
-    public function __construct(VanishV2 $plugin) {
-        $this->plugin = $plugin;
-    }
+    public function __construct(private VanishV2 $plugin){}
 
     public function onRun(): void{
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
