@@ -9,10 +9,10 @@ class TagResolveListener implements Listener{
 
     public function onTagResolve(TagsResolveEvent $event){
         $tag = $event->getTag();
-        $tags = explode('.', $tag->getName(), 2);
+        $tags = explode(".", $tag->getName(), 2);
         $value = "";
 
-        if($tags[0] !== 'VanishV2' || count($tags) < 2){
+        if($tags[0] !== "VanishV2" || count($tags) < 2){
             return;
         }
 

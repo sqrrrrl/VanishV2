@@ -26,9 +26,7 @@ class VanishV2 extends PluginBase {
 
     public static array $online = [];
 
-    public static array $AllowCombatFly = [];
-
-    public function onEnable(): void {
+    protected function onEnable(): void {
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task($this), 20);
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->initConfig();
@@ -37,7 +35,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    public function onDisable(): void {
+    protected function onDisable(): void {
         if (!$this->getConfig()->get("unvanish-after-restart")) {
             $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
             $players = implode("\n", self::$vanish);
@@ -46,7 +44,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    public function initConfig(){
+    private function initConfig(){
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
         if ($this->getConfig()->get("config-version") < 8 || $this->getConfig()->get("config-version") === null) {
@@ -66,7 +64,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    public function libsStuff(){
+    private function libsStuff(){
         if (class_exists(InvMenuHandler::class)) {
             if (!InvMenuHandler::isRegistered()) {
                 InvMenuHandler::register($this);
@@ -138,7 +136,6 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->isSurvival()) {
-                self::$AllowCombatFly[] = $player->getName();
                 $player->setFlying(true);
                 $player->setAllowFlight(true);
             }
@@ -181,7 +178,6 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->isSurvival()) {
-                unset(self::$AllowCombatFly[array_search($player->getName(), self::$AllowCombatFly)]);
                 $player->setFlying(false);
                 $player->setAllowFlight(false);
             }
@@ -196,7 +192,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    public function checkHudVersion(): bool {
+    private function checkHudVersion(): bool {
         if ($this->getServer()->getPluginManager()->getPlugin("ScoreHud")) {
             if(version_compare($this->getServer()->getPluginManager()->getPlugin("ScoreHud")->getDescription()->getVersion(), "6.0.0", ">=")){
                 $this->getServer()->getPluginManager()->registerEvents(new TagResolveListener, $this);
