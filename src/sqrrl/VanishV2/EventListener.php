@@ -136,7 +136,7 @@ class EventListener implements Listener {
                             $name = $block->getName();
                             $inv = $tile->getInventory();
                             $content = $inv->getContents();
-                            if($content !== null) {
+                            if($content != null) {
                                 if($inv instanceof DoubleChestInventory) {
                                     $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
                                 }else{
