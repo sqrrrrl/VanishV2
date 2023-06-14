@@ -166,13 +166,14 @@ class VanishV2 extends PluginBase {
         }
         foreach($this->getServer()->getOnlinePlayers() as $p) {
             $networkSession = $p->getNetworkSession();
+            $skinAdapter = $networkSession->getTypeConverter()->getSkinAdapter();
             $networkSession->sendDataPacket(
                 PlayerListPacket::add([
                     PlayerListEntry::createAdditionEntry(
                         $player->getUniqueId(),
                         $player->getId(),
                         $player->getDisplayName(),
-                        $networkSession->getTypeConverter()->getSkinAdapter()->toSkinData($player->getSkin()),
+                        $skinAdapter->toSkinData($player->getSkin()),
                         $player->getXuid()
                 )]));
         }
