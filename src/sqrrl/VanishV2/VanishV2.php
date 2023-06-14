@@ -26,8 +26,6 @@ class VanishV2 extends PluginBase {
 
     public static array $online = [];
 
-    public static array $AllowCombatFly = [];
-
     public function onEnable(): void {
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task($this), 20);
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
@@ -138,7 +136,6 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->isSurvival()) {
-                self::$AllowCombatFly[] = $player->getName();
                 $player->setFlying(true);
                 $player->setAllowFlight(true);
             }
@@ -181,7 +178,6 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->isSurvival()) {
-                unset(self::$AllowCombatFly[array_search($player->getName(), self::$AllowCombatFly)]);
                 $player->setFlying(false);
                 $player->setAllowFlight(false);
             }
