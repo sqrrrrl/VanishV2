@@ -24,7 +24,6 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\utils\TextFormat;
 use pocketmine\scheduler\ClosureTask;
 use muqsit\invmenu\InvMenu;
-use pocketmine\math\Vector3;
 
 use function array_search;
 use function in_array;
