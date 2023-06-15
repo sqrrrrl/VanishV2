@@ -128,7 +128,8 @@ class EventListener implements Listener {
 
     public function onInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
-        $tile =  $event->getBlock()->getPosition()->getWorld()->getTile($block->getPosition());
+        $block = $event->getBlock();
+        $tile =  $block->getPosition()->getWorld()->getTile($block->getPosition());
         $action = $event->getAction();
         if(in_array($player->getName(), VanishV2::$vanish)) {
             if($this->plugin->getConfig()->get("silent-chest")) {
