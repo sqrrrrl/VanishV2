@@ -208,24 +208,24 @@ class EventListener implements Listener {
             $message = explode(" ", $message);
             $command = array_shift($message);
             if (in_array(strtolower($command), ["tell", "msg", "w"])) {
-                if (isset($message[0])) {
-                    $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
-                    if ($receiver && trim(implode(" ", $message)) !== "") {
-                        if (in_array($receiver->getName(), VanishV2::$vanish) && !$sender->hasPermission("vanish.see") && $sender !== $receiver) {
-                            $event->cancel();
-                            $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
-                            $receiver->sendMessage(VanishV2::PREFIX . str_replace(["%sender", "%message"], [$sender->getName(), implode(" ", $message)], $this->plugin->getConfig()->get("messages")["receiver-message"]));
-                        }
+                $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
+                if ($receiver instanceof Player && trim(implode(" ", $message)) !== "") {
+                    if (in_array($receiver->getName(), VanishV2::$vanish) && !$sender->hasPermission("vanish.see") && $sender !== $receiver) {
+                        $event->cancel();
+                        $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
+                        $receiver->sendMessage(VanishV2::PREFIX . str_replace(["%sender", "%message"], [$sender->getName(), implode(" ", $message)], $this->plugin->getConfig()->get("messages")["receiver-message"]));
                     }
                 }
             }else{
                 if ($this->plugin->getConfig()->get("additional-commands")) {
                     if (array_key_exists(strtolower($command), $this->plugin->getConfig()->get("additional-commands"))) {
                         $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
-                        if ($receiver && in_array($receiver->getName(), VanishV2::$vanish) && !$sender->hasPermission("vanish.see") && $sender !== $receiver) {
-                            $event->cancel();
-                            $sender->sendMessage($this->plugin->getConfig()->get("additional-commands")[$command]["sender-error"]);
-                            $receiver->sendMessage(VanishV2::PREFIX . str_replace("%sender", $sender->getName(), $this->plugin->getConfig()->get("additional-commands")[$command]["receiver-message"]));
+                        if ($receiver instanceof Player && in_array($receiver->getName(), VanishV2::$vanish)) {
+                            if(!$sender->hasPermission("vanish.see") && $sender !== $receiver) {
+                                $event->cancel();
+                                $sender->sendMessage($this->plugin->getConfig()->get("additional-commands")[$command]["sender-error"]);
+                                $receiver->sendMessage(VanishV2::PREFIX . str_replace("%sender", $sender->getName(), $this->plugin->getConfig()->get("additional-commands")[$command]["receiver-message"]));
+                            }
                         }
                     }
                 }
