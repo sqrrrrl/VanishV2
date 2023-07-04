@@ -274,7 +274,14 @@ class EventListener implements Listener {
         }
     }
 
+    /**
+     * @param BlockBreakEvent $event
+     * @priority HIGHEST
+     */
     public function onBlockBreak(BlockBreakEvent $event){
+        if($event->isCancelled()){
+            return;
+        }
         $player = $event->getPlayer();
         $block = $event->getBlock();
         if (in_array($player->getName(), VanishV2::$vanish)){
@@ -299,7 +306,14 @@ class EventListener implements Listener {
         }
     }
 
+    /**
+     * @param BlockPlaceEvent $event
+     * @priority HIGHEST
+     */
     public function onBlockPlace(BlockPlaceEvent $event){
+        if($event->isCancelled()){
+            return;
+        }
         $player = $event->getPlayer();
         if(in_array($player->getName(), VanishV2::$vanish)){
             $event->cancel();
