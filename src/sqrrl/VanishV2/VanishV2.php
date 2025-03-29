@@ -2,6 +2,7 @@
 
 namespace sqrrl\VanishV2;
 
+use MohamadRZ4\Placeholder\PlaceholderAPI;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
@@ -32,6 +33,9 @@ class VanishV2 extends PluginBase {
         $this->initConfig();
         if ($this->isEnabled()) {
             $this->libsStuff();
+        }
+        if ($this->getServer()->getPluginManager()->getPlugin("PlaceholderAPI") !== null) {
+            PlaceholderAPI::getInstance()->registerExpansion(new VanishExpansion());
         }
     }
 
