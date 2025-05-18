@@ -1,6 +1,8 @@
 # VanishV2
 
 VanishV2 is an advanced vanish plugin with a lot of features:
+
+* PlaceholderAPI support
 * Highly configurable
 * Hides the item/armor you are holding/wearing
 * Hides effect particles while vanished
