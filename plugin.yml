@@ -3,7 +3,7 @@ main: sqrrl\VanishV2\VanishV2
 api: 5.0.0
 extensions:
   Core: '>=8.0'
-version: "4.0.3"
+version: "4.0.4"
 author: sqrrl
 commands:
   vanish:
