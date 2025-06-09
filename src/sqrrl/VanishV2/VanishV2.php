@@ -16,8 +16,7 @@ use Ifera\ScoreHud\event\PlayerTagUpdateEvent;
 use Ifera\ScoreHud\scoreboard\ScoreTag;
 use pocketmine\utils\Config;
 
-use function array_search;
-use function in_array;
+use function array_keys;
 use function strtolower;
 
 class VanishV2 extends PluginBase {
@@ -42,7 +41,7 @@ class VanishV2 extends PluginBase {
     protected function onDisable(): void {
         if (!$this->getConfig()->get("unvanish-after-restart")) {
             $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
-            $players = implode("\n", self::$vanish);
+            $players = implode("\n", array_keys(self::$vanish));
             $file->set($players);
             $file->save();
         }
@@ -62,7 +61,7 @@ class VanishV2 extends PluginBase {
             $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
             $players = $file->getAll(true);
             foreach ($players as $player) {
-                self::$vanish[] = $player;
+                self::$vanish[$player] = true;
             }
             unlink($this->getDataFolder() . "vanished_players.txt");
         }
@@ -92,7 +91,7 @@ class VanishV2 extends PluginBase {
 
                 if (count($args) === 0) {
                     if ($sender instanceof Player) {
-                        if (!in_array($sender->getName(), self::$vanish)) {
+                        if (!isset(self::$vanish[$sender->getName()])) {
                             $this->vanish($sender);
                             $sender->sendMessage(self::PREFIX . $this->getConfig()->get("vanish-message"));
                         }else{
@@ -106,7 +105,7 @@ class VanishV2 extends PluginBase {
                     if (count($args) === 1) {
                         $player = $this->getServer()->getPlayerByPrefix($args[0]);
                         if ($player != null) {
-                            if (!in_array($player->getName(), self::$vanish)) {
+                            if (!isset(self::$vanish[$player->getName()])) {
                                 $this->vanish($player);
                                 $msg_sender = $this->getConfig()->get("vanish-other");
                                 $msg_other = $this->getConfig()->get("vanished-other");
@@ -129,13 +128,14 @@ class VanishV2 extends PluginBase {
     }
 
     public function vanish(Player $player) {
-        self::$vanish[] = $player->getName();
-        unset(self::$online[array_search($player->getName(), self::$online, true)]);
+        $name = $player->getName();
+        self::$vanish[$name] = true;
+        unset(self::$online[$player->getName()]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
             $msg = $this->getConfig()->get("FakeLeave-message");
-            $msg = str_replace("%name", $player->getName(), $msg);
+            $msg = str_replace("%name", $name, $msg);
             $this->getServer()->broadcastMessage($msg);
         }
         if ($this->getConfig()->get("enable-fly")) {
@@ -147,15 +147,16 @@ class VanishV2 extends PluginBase {
         foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) {
             if ($onlinePlayer->hasPermission("vanish.see")) {
                 $msg = $this->getConfig()->get("vanish");
-                $msg = str_replace("%name", $player->getName(), $msg);
+                $msg = str_replace("%name", $name, $msg);
                 $onlinePlayer->sendMessage($msg);
             }
         }
     }
 
     public function unvanish(Player $player) {
-        unset(self::$vanish[array_search($player->getName(), self::$vanish)]);
-        self::$online[] = $player->getName();
+        $name = $player->getName();
+        unset(self::$vanish[$name]);
+        self::$online[$name] = true;
         $player->setNameTag(str_replace("[V] ", "", $player->getNameTag()));
         $player->setSilent(false);
         $player->getXpManager()->setCanAttractXpOrbs(true);
@@ -164,7 +165,7 @@ class VanishV2 extends PluginBase {
             $onlinePlayer->showPlayer($player);
             if ($onlinePlayer->hasPermission("vanish.see")) {
                 $msg = $this->getConfig()->get("unvanish");
-                $msg = str_replace("%name", $player->getName(), $msg);
+                $msg = str_replace("%name", $name, $msg);
                 $onlinePlayer->sendMessage($msg);
             }
         }
@@ -191,7 +192,7 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("enable-join")) {
             $msg = $this->getConfig()->get("FakeJoin-message");
-            $msg = str_replace("%name", $player->getName(), $msg);
+            $msg = str_replace("%name", $name, $msg);
             $this->getServer()->broadcastMessage($msg);
         }
     }
