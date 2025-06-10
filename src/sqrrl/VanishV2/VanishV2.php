@@ -30,9 +30,7 @@ class VanishV2 extends PluginBase {
         $this->getScheduler()->scheduleRepeatingTask(new VanishV2Task($this), 20);
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->initConfig();
-        if ($this->isEnabled()) {
-            $this->libsStuff();
-        }
+        $this->checkVirions();
         if ($this->getServer()->getPluginManager()->getPlugin("PlaceholderAPI") !== null) {
             PlaceholderAPI::getInstance()->registerExpansion(new VanishExpansion());
         }
@@ -47,7 +45,7 @@ class VanishV2 extends PluginBase {
         }
     }
 
-    private function initConfig(){
+    private function initConfig(): void {
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
         if ($this->getConfig()->get("config-version") < 8 || $this->getConfig()->get("config-version") === null) {
@@ -60,71 +58,78 @@ class VanishV2 extends PluginBase {
         if (!$this->getConfig()->get("unvanish-after-restart")) {
             $file = new Config($this->getDataFolder() . "vanished_players.txt", CONFIG::ENUM);
             $players = $file->getAll(true);
-            foreach ($players as $player) {
-                self::$vanish[$player] = true;
+            foreach ($players as $name) {
+                self::$vanish[$name] = true;
             }
             unlink($this->getDataFolder() . "vanished_players.txt");
         }
     }
 
-    private function libsStuff(){
-        if (class_exists(InvMenuHandler::class)) {
-            if (!InvMenuHandler::isRegistered()) {
-                InvMenuHandler::register($this);
-            }
-        }else{
+    private function checkVirions(): void {
+        if (!class_exists(InvMenuHandler::class)) {
             $this->getLogger()->error("InvMenu virion not found download VanishV2 on poggit or download InvMenu with DEVirion (not recommended)");
             $this->getServer()->getPluginManager()->disablePlugin($this);
+            return;
+        }
+
+        if (!InvMenuHandler::isRegistered()) {
+            InvMenuHandler::register($this);
         }
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
-        switch (strtolower($command->getName())) {
-            case "vanish":
-            case "v":
-                if (count($args) === 1) {
-                    if (!$sender->hasPermission("vanish.use.other")) {
-                        $sender->sendMessage(self::PREFIX . TextFormat::RED . "You do not have permission to vanish other players");
-                        return false;
-                    }
-                }
-
-                if (count($args) === 0) {
-                    if ($sender instanceof Player) {
-                        if (!isset(self::$vanish[$sender->getName()])) {
-                            $this->vanish($sender);
-                            $sender->sendMessage(self::PREFIX . $this->getConfig()->get("vanish-message"));
-                        }else{
-                            $this->unvanish($sender);
-                            $sender->sendMessage(self::PREFIX . $this->getConfig()->get("unvanish-message"));
-                        }
-                    }else{
-                        $sender->sendMessage(self::PREFIX . TextFormat::RED . "Use this command In-Game");
-                    }
-                }else{
-                    if (count($args) === 1) {
-                        $player = $this->getServer()->getPlayerByPrefix($args[0]);
-                        if ($player != null) {
-                            if (!isset(self::$vanish[$player->getName()])) {
-                                $this->vanish($player);
-                                $msg_sender = $this->getConfig()->get("vanish-other");
-                                $msg_other = $this->getConfig()->get("vanished-other");
-                            }else{
-                                $this->unvanish($player);
-                                $msg_sender = $this->getConfig()->get("unvanish-other");
-                                $msg_other = $this->getConfig()->get("unvanished-other");
-                            }
-                            $msg_other = str_replace("%other-name", $sender->getName(), $msg_other);
-                            $msg_sender = str_replace("%name", $player->getName(), $msg_sender);
-                            $sender->sendMessage(self::PREFIX . $msg_sender);
-                            $player->sendMessage(self::PREFIX . $msg_other);
-                        }else{
-                            $sender->sendMessage(self::PREFIX . TextFormat::RED . "Player not found");
-                        }
-                    }
-                }
+        $commandName = strtolower($command->getName());
+        if ($commandName !== "vanish" && $commandName !== "v") {
+            return false;
         }
-        return true;
+        
+        if (count($args) === 0) {
+            if (!$sender instanceof Player) {
+                $sender->sendMessage(self::PREFIX . TextFormat::RED . "Use this command In-Game");
+                return false;
+            }
+            if (!isset(self::$vanish[$sender->getName()])) {
+                $this->vanish($sender);
+                $sender->sendMessage(self::PREFIX . $this->getConfig()->get("vanish-message"));
+            }else{
+                $this->unvanish($sender);
+                $sender->sendMessage(self::PREFIX . $this->getConfig()->get("unvanish-message"));
+            }
+            return true;
+        }
+
+        if (count($args) === 1) {
+            if (!$sender->hasPermission("vanish.use.other")) {
+                $sender->sendMessage(self::PREFIX . TextFormat::RED . "You do not have permission to vanish other players");
+                return false;
+            }
+
+            $target = $this->getServer()->getPlayerByPrefix($args[0]);
+            if (!$target instanceof Player) {
+                $sender->sendMessage(self::PREFIX . TextFormat::RED . "Player not found");
+                return false;
+            }
+
+            $targetName = $target->getName();
+            if (!isset(self::$vanish[$targetName])) {
+                $this->vanish($target);
+                $msgSender = $this->getConfig()->get("vanish-other");
+                $msgTarget = $this->getConfig()->get("vanished-other");
+            }else{
+                $this->unvanish($target);
+                $msgSender = $this->getConfig()->get("unvanish-other");
+                $msgTarget = $this->getConfig()->get("unvanished-other");
+            }
+
+            $msgSender = str_replace("%name", $targetName, $msgSender);
+            $msgTarget = str_replace("%other-name", $sender->getName(), $msgTarget);
+
+            $sender->sendMessage(self::PREFIX . $msgSender);
+            $target->sendMessage(self::PREFIX . $msgTarget);
+            return true;
+        }
+
+        return false;
     }
 
     public function vanish(Player $player) {
@@ -140,8 +145,8 @@ class VanishV2 extends PluginBase {
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->isSurvival()) {
-                $player->setFlying(true);
-                $player->setAllowFlight(true);
+                $player->setFlying();
+                $player->setAllowFlight();
             }
         }
         foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) {
@@ -163,23 +168,12 @@ class VanishV2 extends PluginBase {
         $this->updateHudPlayerCount();
         foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) {
             $onlinePlayer->showPlayer($player);
+            $onlinePlayer->getNetworkSession()->onPlayerAdded($player);
             if ($onlinePlayer->hasPermission("vanish.see")) {
                 $msg = $this->getConfig()->get("unvanish");
                 $msg = str_replace("%name", $name, $msg);
                 $onlinePlayer->sendMessage($msg);
             }
-        }
-        foreach($this->getServer()->getOnlinePlayers() as $p) {
-            $networkSession = $p->getNetworkSession();
-            $networkSession->sendDataPacket(
-                PlayerListPacket::add([
-                    PlayerListEntry::createAdditionEntry(
-                        $player->getUniqueId(),
-                        $player->getId(),
-                        $player->getDisplayName(),
-                        $networkSession->getTypeConverter()->getSkinAdapter()->toSkinData($player->getSkin()),
-                        $player->getXuid()
-                )]));
         }
         if ($this->getConfig()->get("enable-fly")) {
             if ($player->isSurvival()) {
@@ -207,18 +201,18 @@ class VanishV2 extends PluginBase {
         return false;
     }
 
-    public function updateHudPlayerCount() {
-        if ($this->checkHudVersion()) {
-            foreach ($this->getServer()->getOnlinePlayers() as $player) {
-                if ($player->isOnline()) {
-                    if (!$player->hasPermission("vanish.see")) {
-                        $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
-                    }else{
-                        $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
-                    }
-                    $ev->call();
-                }
+    public function updateHudPlayerCount(): void {
+        if (!$this->checkHudVersion()) {
+            return;
+        }
+
+        foreach ($this->getServer()->getOnlinePlayers() as $player) {
+            if (!$player->hasPermission("vanish.see")) {
+                $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
+            }else{
+                $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers()))));
             }
+            $ev->call();
         }
     }
 }
