@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace sqrrl\VanishV2;
 
 use MohamadRZ4\Placeholder\PlaceholderAPI;
@@ -20,8 +22,9 @@ use function strtolower;
 class VanishV2 extends PluginBase {
     public const PREFIX = TextFormat::BLUE . "VanishV2 " . TextFormat::DARK_GRAY . "» " . TextFormat::RESET;
 
+    /** @var array<string, true> */
     public static array $vanish = [];
-
+    /** @var array<string, true> */
     public static array $online = [];
 
     protected function onEnable(): void {
