@@ -26,7 +26,7 @@ class VanishV2Task extends Task {
                         $player->showPlayer($p);
                     }else{
                         $player->hidePlayer($p);
-                        $player->getNetworkSession()->onPlayerRemoved($p)
+                        $player->getNetworkSession()->onPlayerRemoved($p);
                     }
                 }
             }
