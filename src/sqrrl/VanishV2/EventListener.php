@@ -26,7 +26,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\utils\TextFormat;
 use pocketmine\scheduler\ClosureTask;
-use sqrrl\VanishV2\libs\muqsit\invmenu\InvMenu;
+use muqsit\invmenu\InvMenu;
 
 use function array_keys;
 
