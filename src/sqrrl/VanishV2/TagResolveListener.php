@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace sqrrl\VanishV2;
 
 use pocketmine\event\Listener;
@@ -12,11 +14,11 @@ class TagResolveListener implements Listener{
         $tags = explode(".", $tag->getName(), 2);
         $value = "";
 
-        if($tags[0] !== "VanishV2" || count($tags) < 2){
+        if ($tags[0] !== "VanishV2" || count($tags) < 2) {
             return;
         }
 
-        switch($tags[1]){
+        switch ($tags[1]) {
             case "fake_count":
                 $value = count(VanishV2::$online);
                 break;
