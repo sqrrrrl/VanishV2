@@ -5,6 +5,7 @@ namespace sqrrl\VanishV2;
 use pocketmine\block\Chest;
 use pocketmine\block\inventory\DoubleChestInventory;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\block\tile\Chest;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityCombustEvent;
@@ -25,29 +26,24 @@ use pocketmine\utils\TextFormat;
 use pocketmine\scheduler\ClosureTask;
 use muqsit\invmenu\InvMenu;
 
-use function array_search;
-use function in_array;
+use function array_keys;
 
 class EventListener implements Listener {
 
-    private VanishV2 $plugin;
-
     private static array $silentBlocks = [];
 
-    public function __construct(VanishV2 $plugin) {
-        $this->plugin = $plugin;
-    }
+    public function __construct(private VanishV2 $plugin) {}
 
     public function onQuit(PlayerQuitEvent $event) {
         $player = $event->getPlayer();
         $name = $player->getName();
-        if(in_array($name, VanishV2::$vanish)) {
+        if(isset(VanishV2::$vanish[$name])) {
             if($this->plugin->getConfig()->get("unvanish-after-leaving")) {
-                unset(VanishV2::$vanish[array_search($name, VanishV2::$vanish)]);
+                unset(VanishV2::$vanish[$name]);
             }
         }
-        if(in_array($player->getName(), VanishV2::$online, true)){
-            unset(VanishV2::$online[array_search($player->getName(), VanishV2::$online, true)]);
+        if(isset(VanishV2::$online[$name])){
+            unset(VanishV2::$online[$name]);
             $this->plugin->getScheduler()->scheduleDelayedTask(new ClosureTask(function(): void{
                 $this->plugin->updateHudPlayerCount();
             }), 20);
@@ -55,8 +51,9 @@ class EventListener implements Listener {
     }
 
     public function pickUp(EntityItemPickupEvent $event) {
-        if ($event->getEntity() instanceof Player) {
-            if (in_array($event->getEntity()->getName(), VanishV2::$vanish)) {
+        $entity = $event->getEntity();
+        if ($entity instanceof Player) {
+            if (isset(VanishV2::$vanish[$entity->getName()])) {
                 $event->cancel();
             }
         }
@@ -65,8 +62,7 @@ class EventListener implements Listener {
     public function onDamage(EntityDamageEvent $event) {
         $player = $event->getEntity();
         if($player instanceof Player) {
-            $name = $player->getName();
-            if(in_array($name, VanishV2::$vanish)) {
+            if(isset(VanishV2::$vanish[$player->getName()])) {
                 if($this->plugin->getConfig()->get("disable-damage")) {
                     $event->cancel();
                 }
@@ -77,8 +73,7 @@ class EventListener implements Listener {
     public function onPlayerBurn(EntityCombustEvent $event) {
         $player = $event->getEntity();
         if($player instanceof Player) {
-            $name = $player->getName();
-            if(in_array($name, VanishV2::$vanish)) {
+            if(isset(VanishV2::$vanish[$player->getName()])) {
                 if($this->plugin->getConfig()->get("disable-damage")) {
                     $event->cancel();
                 }
@@ -88,7 +83,7 @@ class EventListener implements Listener {
 
     public function onExhaust(PlayerExhaustEvent $event) {
         $player = $event->getPlayer();
-        if(in_array($player->getName(), VanishV2::$vanish)){
+        if(isset(VanishV2::$vanish[$player->getName()])) {
             if(!$this->plugin->getConfig()->get("hunger")){
                 $event->cancel();
             }
@@ -97,11 +92,10 @@ class EventListener implements Listener {
 
     public function onJoin(PlayerJoinEvent $event){
         $player = $event->getPlayer();
-        if(!in_array($player->getName(), VanishV2::$vanish)){
-            if(!in_array($player->getName(), VanishV2::$online, true)) {
-                VanishV2::$online[] = $player->getName();
-                $this->plugin->updateHudPlayerCount();
-            }
+        $name = $player->getName();
+        if(!isset(VanishV2::$vanish[$name]) && !isset(VanishV2::$online[$name])) {
+            VanishV2::$online[$name] = true;
+            $this->plugin->updateHudPlayerCount();
         }
     }
 
@@ -111,15 +105,15 @@ class EventListener implements Listener {
      */
     public function setNametag(PlayerJoinEvent $event){
         $player = $event->getPlayer();
-        if (in_array($player->getName(), VanishV2::$vanish)){
+        if (isset(VanishV2::$vanish[$player->getName()])){
             $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         }
     }
 
     public function onQuery(QueryRegenerateEvent $event) {
-        $event->getQueryInfo()->setPlayerList(VanishV2::$online);
+        $event->getQueryInfo()->setPlayerList(array_keys(VanishV2::$online));
         foreach(Server::getInstance()->getOnlinePlayers() as $p) {
-            if(in_array($p->getName(), VanishV2::$vanish)) {
+            if(isset(VanishV2::$vanish[$p->getName()])) {
                 $online = $event->getQueryInfo()->getPlayerCount();
                 $event->getQueryInfo()->setPlayerCount($online - 1);
             }
@@ -129,37 +123,40 @@ class EventListener implements Listener {
     public function onInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
         $block = $event->getBlock();
-        $tile =  $block->getPosition()->getWorld()->getTile($block->getPosition());
-        $action = $event->getAction();
-        if(in_array($player->getName(), VanishV2::$vanish)) {
-            if($this->plugin->getConfig()->get("silent-chest")) {
-                if($block instanceof Chest) {
-                    if($action === $event::RIGHT_CLICK_BLOCK) {
-                        if(!$player->isSneaking()) {
-                            $event->cancel();
-                            $name = $block->getName();
-                            $inv = $tile->getInventory();
-                            $content = $inv->getContents();
-                            if($content !== null) {
-                                if($inv instanceof DoubleChestInventory) {
-                                    $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
-                                }else{
-                                    $menu = InvMenu::create(InvMenu::TYPE_CHEST);
-                                }
-                                $menu->getInventory()->setContents($content);
-                                $menu->setListener(InvMenu::readonly());
-                                $menu->setName($name);
-                                $menu->send($player);
-                            }else{
-                                $player->sendMessage(VanishV2::PREFIX . TextFormat::RED . "This chest is empty");
-                            }
-                        }
-                    }else{
-                        $event->cancel();
-                    }
-                }
-            }
+
+        if (
+            !isset(VanishV2::$vanish[$player->getName()]) ||
+            !$this->plugin->getConfig()->get("silent-chest") ||
+            !$block instanceof Chest ||
+            $player->isSneaking()
+        ) {
+            return;
         }
+
+        if ($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
+        $event->cancel();
+
+        $tile = $block->getPosition()->getWorld()->getTile($block->getPosition());
+        if (!$tile instanceof Chest) {
+            return;
+        }
+
+        $inventory = $tile->getInventory();
+        $contents = $inventory->getContents();
+
+        if (empty($contents)) {
+            $player->sendMessage(VanishV2::PREFIX . TextFormat::RED . "This chest is empty");
+            return;
+        }
+
+        $menu = InvMenu::create($inventory instanceof DoubleChestInventory ? InvMenu::TYPE_DOUBLE_CHEST : InvMenu::TYPE_CHEST);
+        $menu->getInventory()->setContents($contents);
+        $menu->setListener(InvMenu::readonly());
+        $menu->setName($block->getName());
+        $menu->send($player);
     }
 
     /**
@@ -167,16 +164,18 @@ class EventListener implements Listener {
      * @priority HIGHEST
      */
     public function silentJoin(PlayerJoinEvent $event) {
-        if ($event->getPlayer()->hasPermission("vanish.silent")) {
-            if ($this->plugin->getConfig()->get("silent-join-leave")["join"]) {
-                if (!$this->plugin->getConfig()->get("silent-join-leave")["vanished-only"]) {
-                    $event->setJoinMessage("");
-                }else{
-                    if (in_array($event->getPlayer()->getName(), VanishV2::$vanish)){
-                        $event->setJoinMessage("");
-                    }
-                }
-            }
+        $player = $event->getPlayer();
+        if (!$player->hasPermission("vanish.silent")) {
+            return;
+        }
+
+        $config = $this->plugin->getConfig()->get("silent-join-leave");
+        if (!$config["join"]) {
+          return;
+        }
+        
+        if (!$config["vanished-only"] || isset(VanishV2::$vanish[$player->getName()])) {
+            $event->setJoinMessage("");
         }
     }
 
@@ -185,51 +184,66 @@ class EventListener implements Listener {
      * @priority HIGHEST
      */
     public function silentLeave(PlayerQuitEvent $event) {
-        if ($event->getPlayer()->hasPermission("vanish.silent")) {
-            if ($this->plugin->getConfig()->get("silent-join-leave")["leave"]) {
-                if (!$this->plugin->getConfig()->get("silent-join-leave")["vanished-only"]) {
-                    $event->setQuitMessage("");
-                }else{
-                    if (in_array($event->getPlayer()->getName(), VanishV2::$vanish)){
-                        $event->setQuitMessage("");
-                    }
-                }
-            }
+        $player = $event->getPlayer();
+        if (!$player->hasPermission("vanish.silent")) {
+            return;
+        }
+
+        $config = $this->plugin->getConfig()->get("silent-join-leave");
+        if (!$config["leave"]) {
+            return;
+        }
+
+        if (!$config["vanished-only"] || isset(VanishV2::$vanish[$player->getName()])) {
+            $event->setJoinMessage("");
         }
     }
 
     public function onCommandExecute(CommandEvent $event){
         $sender = $event->getSender();
-        if (!$sender instanceof Player) {
+        if (!$sender instanceof Player || $this->plugin->getConfig()->get("can-send-msg")) {
             return;
         }
-        if (!$this->plugin->getConfig()->get("can-send-msg")) {
-            $message = $event->getCommand();
-            $message = explode(" ", $message);
-            $command = array_shift($message);
-            if (in_array(strtolower($command), ["tell", "msg", "w"])) {
-                if (isset($message[0])) {
-                    $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
-                    if ($receiver && trim(implode(" ", $message)) !== "") {
-                        if (in_array($receiver->getName(), VanishV2::$vanish) && !$sender->hasPermission("vanish.see") && $sender !== $receiver) {
-                            $event->cancel();
-                            $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
-                            $receiver->sendMessage(VanishV2::PREFIX . str_replace(["%sender", "%message"], [$sender->getName(), implode(" ", $message)], $this->plugin->getConfig()->get("messages")["receiver-message"]));
-                        }
-                    }
-                }
-            }else{
-                if ($this->plugin->getConfig()->get("additional-commands")) {
-                    if (array_key_exists(strtolower($command), $this->plugin->getConfig()->get("additional-commands"))) {
-                        $receiver = $this->plugin->getServer()->getPlayerByPrefix(array_shift($message));
-                        if ($receiver && in_array($receiver->getName(), VanishV2::$vanish) && !$sender->hasPermission("vanish.see") && $sender !== $receiver) {
-                            $event->cancel();
-                            $sender->sendMessage($this->plugin->getConfig()->get("additional-commands")[$command]["sender-error"]);
-                            $receiver->sendMessage(VanishV2::PREFIX . str_replace("%sender", $sender->getName(), $this->plugin->getConfig()->get("additional-commands")[$command]["receiver-message"]));
-                        }
-                    }
-                }
-            }
+
+        $args = explode(" ", $event->getCommand());
+        $command = strtolower(array_shift($args));
+        $receiverName = array_shift($args);
+        $message = implode(" ", $args);
+
+        if (!$receiverName || $message === "") {
+            return;
+        }
+
+        $receiver = $this->plugin->getServer()->getPlayerByPrefix($receiverName);
+        if (
+            !$receiver ||
+            $sender === $receiver ||
+            $sender->hasPermission("vanish.see") ||
+            !isset(VanishV2::$vanish[$receiver->getName()])
+        ) {
+            return;
+        }
+
+        $messagingCommands = array_fill_keys(["tell", "msg", "w"], true);
+
+        $additionalCommands = $this->plugin->getConfig()->get("additional-commands");
+
+        if (isset($messagingCommands[$command])) {
+            $event->cancel();
+            $sender->sendMessage($this->plugin->getConfig()->get("messages")["sender-error"]);
+            $receiver->sendMessage(VanishV2::PREFIX . str_replace(
+                ["%sender", "%message"],
+                [$sender->getName(), $message],
+                $this->plugin->getConfig()->get("messages")["receiver-message"]
+            ));
+        } elseif (is_array($additionalCommands) && isset($additionalCommands[$command])) {
+            $event->cancel();
+            $sender->sendMessage($additionalCommands[$command]["sender-error"]);
+            $receiver->sendMessage(VanishV2::PREFIX . str_replace(
+                "%sender",
+                $sender->getName(),
+                $additionalCommands[$command]["receiver-message"]
+            ));
         }
     }
 
@@ -238,7 +252,7 @@ class EventListener implements Listener {
         $player = $event->getEntity();
         if ($damager instanceof Player && $player instanceof Player){
             if (!$damager->hasPermission("vanish.attack")){
-                if (in_array($damager->getName(), VanishV2::$vanish)){
+                if (isset(VanishV2::$vanish[$damager->getName()])){
                     $damager->sendMessage($this->plugin->getConfig()->get("hit-no-permission"));
                     $event->cancel();
                 }
@@ -252,14 +266,17 @@ class EventListener implements Listener {
      */
     public function onBlockInteract(PlayerInteractEvent $event){
         $player = $event->getPlayer();
-        if(in_array($player->getName(), VanishV2::$vanish) && $event->getAction() === PlayerInteractEvent::LEFT_CLICK_BLOCK){
-            $position = $event->getBlock()->getPosition();
-            $delay = round($event->getBlock()->getBreakInfo()->getBreakTime($player->getInventory()->getItemInHand())) * 20;
-            self::$silentBlocks[] = $position;
-            $this->plugin->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($position): void{
-                unset(self::$silentBlocks[array_search($position, self::$silentBlocks)]);
-            }), $delay);
+        if (!isset(VanishV2::$vanish[$player->getName()]) && $event->getAction() !== PlayerInteractEvent::LEFT_CLICK_BLOCK) {
+            return;
         }
+
+        $block = $event->getBlock();
+        $position = $block->getPosition();
+        $delay = round($block->getBreakInfo()->getBreakTime($player->getInventory()->getItemInHand())) * 20;
+        self::$silentBlocks[(string) $position] = true;
+        $this->plugin->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($position): void{
+            unset(self::$silentBlocks[(string) $position]);
+        }), $delay);
     }
 
     /**
@@ -267,10 +284,9 @@ class EventListener implements Listener {
      * @priority HIGHEST
      */
     public function onWorldSoundBroadcast(WorldSoundEvent $event){
-        foreach (self::$silentBlocks as $silentBlock){
-            if ($event->getPosition()->equals($silentBlock)){
-                $event->cancel();
-            }
+        $position = $event->getPosition();
+        if (isset(self::$silentBlocks[(string) $position])) {
+            $event->cancel();
         }
     }
 
@@ -279,31 +295,42 @@ class EventListener implements Listener {
      * @priority HIGHEST
      */
     public function onBlockBreak(BlockBreakEvent $event){
-        if($event->isCancelled()){
+        if ($event->isCancelled()) {
             return;
         }
+
         $player = $event->getPlayer();
+        $inventory = $player->getInventory();
+        $world = $player->getWorld();
         $block = $event->getBlock();
-        if (in_array($player->getName(), VanishV2::$vanish)){
-            $event->cancel();
-            $player->getWorld()->setBlock($block->getPosition(), VanillaBlocks::AIR());
-            if($player->isSurvival(true)){
-                $drops = $event->getDrops();
-                $xpDrop = $event->getXpDropAmount();
-                $player->getXpManager()->addXp($xpDrop);
-                foreach ($drops as $drop){
-                    if($player->getInventory()->canAddItem($drop)){
-                        $player->getInventory()->addItem($drop);
-                    }else{
-                        $player->getWorld()->dropItem($event->getBlock()->getPosition()->add(0.5, 0.5, 0.5), $drop);
-                    }
-                }
-                $item = $player->getInventory()->getItemInHand();
-                $returnedItems = [];
-                $item->onDestroyBlock($block, $returnedItems);
-                $player->getInventory()->setItemInHand($item);
+        $position = $block->getPosition();
+
+        if (!isset(VanishV2::$vanish[$player->getName()])) {
+            return;
+        }
+
+        $event->cancel();
+        $world->setBlock($position, VanillaBlocks::AIR());
+
+        if (!$player->isSurvival()) {
+            return;
+        }
+
+        $drops = $event->getDrops();
+        $xpDrop = $event->getXpDropAmount();
+        $player->getXpManager()->addXp($xpDrop);
+
+        foreach ($drops as $drop) {
+            if ($player->getInventory()->canAddItem($drop)) {
+                $player->getInventory()->addItem($drop);
+            }else{
+                $world->dropItem($position->add(0.5, 0.5, 0.5), $drop);
             }
         }
+
+        $item = $inventory->getItemInHand();
+        $item->onDestroyBlock($block, returnedItems: []);
+        $inventory->setItemInHand($item);
     }
 
     /**
@@ -315,11 +342,11 @@ class EventListener implements Listener {
             return;
         }
         $player = $event->getPlayer();
-        if(in_array($player->getName(), VanishV2::$vanish)){
+        if(isset(VanishV2::$vanish[$player->getName()])){
             $event->cancel();
             $event->getTransaction()->apply();
-            if($player->isSurvival(true)){
-                $player->getInventory()->removeItem($event->getItem()->setCount(1));
+            if($player->isSurvival()){
+                $player->getInventory()->removeItem($event->getItem()->pop());
             }
         }
     }
