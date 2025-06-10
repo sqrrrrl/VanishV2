@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace sqrrl\VanishV2;
 
 use pocketmine\entity\effect\EffectInstance;
