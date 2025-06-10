@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace sqrrl\VanishV2;
 
 use pocketmine\block\Chest;
@@ -30,6 +32,7 @@ use function array_keys;
 
 class EventListener implements Listener {
 
+    /** @var array<string, true> */
     private static array $silentBlocks = [];
 
     public function __construct(private VanishV2 $plugin) {}
