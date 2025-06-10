@@ -7,7 +7,7 @@ namespace sqrrl\VanishV2;
 use pocketmine\block\Chest;
 use pocketmine\block\inventory\DoubleChestInventory;
 use pocketmine\block\VanillaBlocks;
-use pocketmine\block\tile\Chest;
+use pocketmine\block\tile\Chest as TileChest;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityCombustEvent;
@@ -143,7 +143,7 @@ class EventListener implements Listener {
         $event->cancel();
 
         $tile = $block->getPosition()->getWorld()->getTile($block->getPosition());
-        if (!$tile instanceof Chest) {
+        if (!$tile instanceof TileChest) {
             return;
         }
 
