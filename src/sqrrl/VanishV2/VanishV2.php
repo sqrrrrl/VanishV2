@@ -4,8 +4,6 @@ namespace sqrrl\VanishV2;
 
 use MohamadRZ4\Placeholder\PlaceholderAPI;
 use pocketmine\entity\effect\VanillaEffects;
-use pocketmine\network\mcpe\protocol\PlayerListPacket;
-use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use muqsit\invmenu\InvMenuHandler;
