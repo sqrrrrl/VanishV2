@@ -83,7 +83,7 @@ class VanishV2 extends PluginBase {
         if ($commandName !== "vanish" && $commandName !== "v") {
             return false;
         }
-        
+
         if (count($args) === 0) {
             if (!$sender instanceof Player) {
                 $sender->sendMessage(self::PREFIX . TextFormat::RED . "Use this command In-Game");
@@ -136,7 +136,7 @@ class VanishV2 extends PluginBase {
     public function vanish(Player $player) {
         $name = $player->getName();
         self::$vanish[$name] = true;
-        unset(self::$online[$player->getName()]);
+        unset(self::$online[$name]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
