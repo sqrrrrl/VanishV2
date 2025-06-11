@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace sqrrl\VanishV2;
 
-use pocketmine\entity\effect\EffectInstance;
-use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\scheduler\Task;
-use pocketmine\Server;
 
 class VanishV2Task extends Task {
 
     public function __construct(private VanishV2 $plugin) {}
 
     public function onRun(): void{
-        foreach(Server::getInstance()->getOnlinePlayers() as $p){
+        $onlinePlayers = $this->plugin->getServer()->getOnlinePlayers();
+        foreach($onlinePlayers as $p){
             if (isset(VanishV2::$vanish[$p->getName()])) {
                 $p->sendTip($this->plugin->getConfig()->get("hud-message"));
-                foreach(Server::getInstance()->getOnlinePlayers() as $player){
+                foreach($onlinePlayers as $player){
                     if ($player->hasPermission("vanish.see")) {
                         $player->showPlayer($p);
                     }else{
