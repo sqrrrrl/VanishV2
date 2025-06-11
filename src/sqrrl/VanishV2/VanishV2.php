@@ -138,6 +138,7 @@ class VanishV2 extends PluginBase {
         self::$vanish[$name] = true;
         unset(self::$online[$name]);
         $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
+        $player->setSilent();
         $this->updateHudPlayerCount();
         if ($this->getConfig()->get("enable-leave")) {
             $msg = $this->getConfig()->get("FakeLeave-message");
