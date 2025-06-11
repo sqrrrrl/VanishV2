@@ -17,10 +17,6 @@ class VanishV2Task extends Task {
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
             if (isset(VanishV2::$vanish[$p->getName()])) {
                 $p->sendTip($this->plugin->getConfig()->get("hud-message"));
-                $p->getXpManager()->setCanAttractXpOrbs(false);
-                if ($this->plugin->getConfig()->get("night-vision")) {
-                    $p->getEffects()->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), null, 0, false));
-                }
                 foreach(Server::getInstance()->getOnlinePlayers() as $player){
                     if ($player->hasPermission("vanish.see")) {
                         $player->showPlayer($p);
