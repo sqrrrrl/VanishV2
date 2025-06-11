@@ -147,6 +147,7 @@ class VanishV2 extends PluginBase {
 
   public function vanish(Player $player) {
     $name = $player->getName();
+    $server = $this->getServer();
     self::$vanish[$name] = true;
     unset(self::$online[$name]);
     $player->setNameTag(TextFormat::GOLD . "[V] " . TextFormat::RESET . $player->getNameTag());
@@ -162,7 +163,7 @@ class VanishV2 extends PluginBase {
     if ($this->getConfig()->get("night-vision")) {
       $player->getEffects()->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), Limits::INT32_MAX, 0, false));
     }
-    foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) {
+    foreach ($server->getOnlinePlayers() as $onlinePlayer) {
       if ($onlinePlayer->hasPermission("vanish.see")) {
         $msg = $this->getConfig()->get("vanish");
         $msg = str_replace("%name", $name, $msg);
@@ -172,12 +173,13 @@ class VanishV2 extends PluginBase {
     if ($this->getConfig()->get("enable-leave")) {
       $msg = $this->getConfig()->get("FakeLeave-message");
       $msg = str_replace("%name", $name, $msg);
-      $this->getServer()->broadcastMessage($msg);
+      $server->broadcastMessage($msg);
     }
   }
 
   public function unvanish(Player $player) {
     $name = $player->getName();
+    $server = $this->getServer();
     unset(self::$vanish[$name]);
     self::$online[$name] = true;
     $player->setNameTag(str_replace("[V] ", "", $player->getNameTag()));
@@ -193,7 +195,7 @@ class VanishV2 extends PluginBase {
     if ($this->getConfig()->get("night-vision")) {
       $player->getEffects()->remove(VanillaEffects::NIGHT_VISION());
     }
-    foreach ($this->getServer()->getOnlinePlayers() as $onlinePlayer) {
+    foreach ($server as $onlinePlayer) {
       $onlinePlayer->showPlayer($player);
       $onlinePlayer->getNetworkSession()->onPlayerAdded($player);
       if ($onlinePlayer->hasPermission("vanish.see")) {
@@ -205,7 +207,7 @@ class VanishV2 extends PluginBase {
     if ($this->getConfig()->get("enable-join")) {
       $msg = $this->getConfig()->get("FakeJoin-message");
       $msg = str_replace("%name", $name, $msg);
-      $this->getServer()->broadcastMessage($msg);
+      $server->broadcastMessage($msg);
     }
   }
 
@@ -240,13 +242,14 @@ class VanishV2 extends PluginBase {
       return;
     }
 
-    foreach ($this->getServer()->getOnlinePlayers() as $player) {
+    $onlinePlayers = $this->getServer()->getOnlinePlayers();
+    foreach ($onlinePlayers as $player) {
       if (!$player->hasPermission("vanish.see")) {
         $ev = new PlayerTagUpdateEvent($player, new ScoreTag("VanishV2.fake_count", strval(count(self::$online))));
       } else {
         $ev = new PlayerTagUpdateEvent(
           $player,
-          new ScoreTag("VanishV2.fake_count", strval(count($this->getServer()->getOnlinePlayers())))
+          new ScoreTag("VanishV2.fake_count", strval(count($onlinePlayers)))
         );
       }
       $ev->call();
